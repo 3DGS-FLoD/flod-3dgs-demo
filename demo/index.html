@@ -5,101 +5,166 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>3D Gaussian Splat Viewer Examples</title>
+  <title>FLoD Viewer Examples</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --secondary-color: #f8fafc;
+      --accent-color: #06b6d4;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --background: #ffffff;
+      --background-secondary: #f8fafc;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
-      background-color: #CCD5DE;
-      height: 100vh;
-      margin: 0px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-primary);
+      line-height: 1.6;
     }
 
     a {
       text-decoration: none;
-      color: #3333CC;
+      color: var(--primary-color);
+      transition: color 0.2s ease;
     }
 
     a:hover {
-      text-decoration: underline;
-      color: #1111AA;
+      color: var(--primary-hover);
     }
 
     .demo-content {
       display: block;
-      margin: 10px;
+      margin: 20px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .header-content-container {
-      background-color: #e7e9eb;
-      border-radius: 7px;
-      -moz-box-shadow: 0px 2px 10px -1px rgb(0 0 0 / 39%);
-      -webkit-box-shadow: 0px 2px 10px -1px rgb(0 0 0 / 39%);
-      box-shadow: 0px 2px 10px -1px rgb(0 0 0 / 39%);
-      max-width: 1065px;
+      background: var(--background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-width: 1200px;
       min-width: 350px;
       margin: auto;
-      font-family: "PT Sans", Arial, serif;
-      font-size: 12pt;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
     }
 
     .title {
       display: flex;
       text-align: center;
-      padding: 10px;
-      -moz-box-shadow: 0 5px 10px -5px #aaa;
-      -webkit-box-shadow: 0 5px 10px -5px #aaa;
-      box-shadow: 0 5px 10px -5px #aaa;
-      margin-bottom: 15px;
-      font-family: "PT Sans", Arial, serif;
-      font-size: 15pt;
-      color: #111111;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.025em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .title::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .title span {
+      position: relative;
+      z-index: 1;
     }
 
     .small-title {
-      font-family: "PT Sans", Arial, serif;
-      font-size: 12pt;
-      font-weight: bold;
-      color: #333333;
-      margin-bottom: 5px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      padding: 0 2rem;
+      margin-top: 2rem;
     }
 
     .content-row {
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-top: 10px;
-      padding-bottom: 10px;
+      padding: 2rem;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       text-align: center;
+      gap: 1.5rem;
+      justify-content: center;
     }
 
     .demo-scene-panel {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      padding: 10px;
-      color: #111111;
-      border-radius: 7px;
-      border: #bbbbbb 1px solid;
-      background-color: #f1f1f1;
-      width: 220px;
-      margin-left: 8px;
-      margin-right: 8px;
+      margin: 0;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      width: 280px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-scene-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     }
 
     .demo-scene-panel.clickable:hover {
-      color: #333333;
-      border-color: #8a9ba8;
-      background-color: #e4edfc;
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
       cursor: pointer;
     }
 
     .demo-scene-panel-image {
-      width: 95%;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      width: 209px;
-      height: 149px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      height: 180px;
+      object-fit: cover;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s ease;
+    }
+
+    .demo-scene-panel.clickable:hover .demo-scene-panel-image {
+      transform: scale(1.05);
     }
 
     .demo-scene-button-row {
@@ -107,169 +172,189 @@
       flex-direction: row;
       width: 100%;
       justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
 
     .demo-scene-button {
-      border-radius: 5px;
-      border: #cccccc 2px solid;
-      background-color: #eeeeee;
-      color: #666666;
-      padding: 3px 7px 3px 7px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--background-secondary);
+      color: var(--text-secondary);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .demo-scene-button:hover {
-      color: #333333;
-      border: #aaaaaa 2px solid;
-      background-color: #e7eaf1;
-      cursor: pointer;
+      color: var(--text-primary);
+      border-color: var(--primary-color);
+      background: var(--primary-color);
+      color: white;
     }
 
     .button {
-      color: #3C5060;
-      border: #AEC5D7 1px solid;
-      background-color: #E5EAEE;
-      padding: 5px;
-      border-radius: 3px;
-      filter: drop-shadow(2px 2px 3px #aaaaaa);
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      background: transparent;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
     }
 
-    .button:hover{
-      cursor: pointer;
-      color: #1B242B;
-      background-color: #E4EFF9;
-      border-color: #4A5A67;
+    .button:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     .text-input {
-      border: hsl(0, 0%, 67%) 1px solid;
-      background-color: #ffffff;
-      padding: 4px;
-      border-radius: 3px;
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
     }
 
     .checkbox-input {
-      width: 17px;
-      height: 17px;
-      padding: 0px;
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
       margin: 0;
+      accent-color: var(--primary-color);
     }
 
     .splat-panel {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      padding: 10px;
-      color: #111111;
-      font-size: 12pt;
-      font-family: "PT Sans", Arial, serif;
-      border-radius: 7px;
-      border: #bbbbbb 1px solid;
-      background-color: #f1f1f1;
-      width: 310px;
-      height: 280px;
-      margin-left: 8px;
-      margin-right: 8px;
+      margin: 0;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      width: 350px;
+      height: 320px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .splat-panel:hover {
+      box-shadow: var(--shadow-md);
     }
 
     .loading-icon {
-        width: 35px;
-        padding: 15px;
-        background: #324d70;
-        z-index:99999;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        --_m:
-            conic-gradient(#0000,#000),
-            linear-gradient(#000 0 0) content-box;
-        -webkit-mask: var(--_m);
-            mask: var(--_m);
-        -webkit-mask-composite: source-out;
-            mask-composite: subtract;
-        box-sizing: border-box;
-        animation: ply-load 1s linear infinite;
-    }
-
-    .controls-key {
-        font-weight: bold;
-        padding: 3px;
-        border: #aaaaaa 1px solid;
-        background-color: #dddddd;
-    }
-
-    .controls-key-description {
-        text-align: left;
-        padding-left: 10px;
-    }
-
-    .file-ext {
-        border: #bababa 1px solid;
-        border-radius: 3px;
-        background-color: #e6e6e6;
-        padding-left: 5px;
-        padding-right: 5px;
-        padding-top: 3px;
-        padding-bottom: 3px;
-        margin-left: 3px;
-        margin-right: 3px;
-    }
-
-    .file-ext-small {
-        border: #ababab 1px solid;
-        border-radius: 3px;
-        background-color: #dfdfdf;
-        padding-left: 4px;
-        padding-right: 4px;
-        padding-bottom: 1px;
-        margin-left: 3px;
-        margin-right: 3px;
-    }
-
-    .valid-value-label {
-      color:#888888;
-      font-size: 10pt;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      background: var(--primary-color);
+      border-radius: 50%;
+      --_m: conic-gradient(#0000, #000), linear-gradient(#000 0 0) content-box;
+      -webkit-mask: var(--_m);
+      mask: var(--_m);
+      -webkit-mask-composite: source-out;
+      mask-composite: subtract;
+      box-sizing: border-box;
+      animation: ply-load 1s linear infinite;
     }
 
     @keyframes ply-load {
-        to{transform: rotate(1turn)}
+      to {
+        transform: rotate(1turn);
+      }
     }
 
-    @media (max-width: 740px){
-  
-        .demo-scene-panel {
-            width: 340px;
-        }
-
-        .splat-panel {
-            width: 340px;
-        }
-
-        .demo-scene-panel-image {
-          width: 95%;
-          height: 95%;
-        }
-
+    .controls-key {
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--background-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
     }
 
-    @media (max-width: 370px){
-  
-        .demo-scene-panel {
-            max-width: 300px;
-        }
-
-        .splat-panel {
-            max-width: 300px;
-        }
-
-        .header-content-container {
-          min-width: 330px;
-        }
-
-        .demo-scene-panel-image {
-          width: 95%;
-          height: 95%;
-        }
-
+    .controls-key-description {
+      text-align: left;
+      padding-left: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
     }
 
+    .file-ext {
+      border: #bababa 1px solid;
+      border-radius: 3px;
+      background-color: #e6e6e6;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+      margin-left: 3px;
+      margin-right: 3px;
+    }
+
+    .file-ext-small {
+      border: #ababab 1px solid;
+      border-radius: 3px;
+      background-color: #dfdfdf;
+      padding-left: 4px;
+      padding-right: 4px;
+      padding-bottom: 1px;
+      margin-left: 3px;
+      margin-right: 3px;
+    }
+
+    .valid-value-label {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .demo-content {
+        margin: 10px;
+      }
+      
+      .content-row {
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      .demo-scene-panel {
+        width: 100%;
+        max-width: 320px;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+        padding: 1.5rem;
+      }
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Focus styles for accessibility */
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
   </style>
   <script type="importmap">
     {
@@ -616,7 +701,7 @@
     <div class="header-content-container">
       <div class="title">
         <div style="margin: auto">
-          3D Gaussian Splatting with Three.js
+          FLoD with Three.js
         </div>
       </div>
       <div style="padding-left: 20px; padding-right: 20px;">
@@ -683,6 +768,58 @@
               <img src="assets/images/bonsai.png" class="demo-scene-panel-image">
               <div class="demo-scene-button-row">
                 <div class="demo-scene-button" onclick="openDemo('vr', [['mode', '0']])">Open</div>
+              </div>
+            </div>
+            <!-- FLOD SCENES(lvl5) ADDED HERE -->
+            <div class="demo-scene-panel">
+              <div class="small-title">Kitchen</div>
+              <img src="assets/images/kitchen.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '1']])">1</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '2']])">2</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '3']])">3</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '4']])">4</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '5']])">5</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '1']])">1</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '2']])">2</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '3']])">3</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '4']])">4</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '5']])">5</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v1</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive1', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v2</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive2', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v3</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive3', [['mode', '3']])">Open</div>
               </div>
             </div>
           </div>
