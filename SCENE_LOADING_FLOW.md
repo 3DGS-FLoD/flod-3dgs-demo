@@ -64,15 +64,38 @@ flowchart TD
     B --> C[downloadSplatSceneToSplatBuffer]
     C --> D[buildSection]
     D --> E[addSplatBuffers]
-    E --> G{setup sort worker?}
+    E --> G1[addSplatBuffersToMesh]
+    G1 --> G{setup sort worker?}
     G -->|yes| H[setupSortWorker]
     G -->|no| I[runSplatSort]
     H --> I
   end
-  subgraph SplatMesh_js [src/splatmesh/SplatMesh.js]
-    F[addSplatBuffersToMesh]
+  subgraph Loaders [src/loaders/*]
+    L1[PlyLoader.loadFromURL]
+    L2[KSplatLoader.loadFromURL]
+    L3[SplatLoader.loadFromURL]
   end
-  E --> F
+  C --> L1
+  C --> L2
+  C --> L3
+  subgraph Util_js [src/Util.js]
+    U1[fetchWithProgress]
+    U2[delayedExecute]
+  end
+  L1 --> U1
+  L2 --> U1
+  L3 --> U1
+  L1 --> U2
+  L2 --> U2
+  L3 --> U2
+  subgraph SplatMesh_js [src/splatmesh]
+    SM1[SplatMesh.addSplatBuffersToMesh]
+    SM2[buildScenes]
+    SM3[refreshGPUDataFromSplatBuffers]
+    SM4[buildSplatTree]
+  end
+  G1 --> SM1
+  SM1 --> SM2 --> SM3 --> SM4
   I --> J[ready to render]
 ```
 
@@ -145,15 +168,38 @@ flowchart TD
     D --> E[checkAndBuildProgressiveLoadSections]
     E --> F[buildSection]
     F --> G[addSplatBuffers]
-    G --> I{setup sort worker?}
+    G --> G1[addSplatBuffersToMesh]
+    G1 --> I{setup sort worker?}
     I -->|yes| J[setupSortWorker]
     I -->|no| K[runSplatSort]
     J --> K
   end
-  subgraph SplatMesh_js [src/splatmesh/SplatMesh.js]
-    H[addSplatBuffersToMesh]
+  subgraph Loaders [src/loaders/*]
+    L1[PlyLoader.loadFromURL]
+    L2[KSplatLoader.loadFromURL]
+    L3[SplatLoader.loadFromURL]
   end
-  G --> H
+  C --> L1
+  C --> L2
+  C --> L3
+  subgraph Util_js [src/Util.js]
+    U1[fetchWithProgress]
+    U2[delayedExecute]
+  end
+  L1 --> U1
+  L2 --> U1
+  L3 --> U1
+  L1 --> U2
+  L2 --> U2
+  L3 --> U2
+  subgraph SplatMesh_js [src/splatmesh]
+    SM1[SplatMesh.addSplatBuffersToMesh]
+    SM2[buildScenes]
+    SM3[refreshGPUDataFromSplatBuffers]
+    SM4[buildSplatTree]
+  end
+  G1 --> SM1
+  SM1 --> SM2 --> SM3 --> SM4
   K --> L{first section?}
   L -->|yes| M[first-section promise resolved]
   L -->|no| N{final section?}
