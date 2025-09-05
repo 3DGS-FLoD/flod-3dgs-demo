@@ -744,13 +744,8 @@ export class Viewer {
         }
 
         if (options.progressiveLoad && this.splatMesh.scenes && this.splatMesh.scenes.length > 0) {
-            // Only block progressive loading if there's an active load (concurrent loading)
-            if (this.isLoadingOrUnloading()) {
-                console.log('addSplatScene(): "progressiveLoad" option ignored because another load is in progress');
-                options.progressiveLoad = false;
-            } else {
-                console.log('addSplatScene(): Sequential progressive loading enabled');
-            }
+            console.log('addSplatScene(): "progressiveLoad" option ignore because there are multiple splat scenes');
+            options.progressiveLoad = false;
         }
 
         const format = (options.format !== undefined && options.format !== null) ? options.format : sceneFormatFromPath(path);
