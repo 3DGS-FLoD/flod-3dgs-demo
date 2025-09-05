@@ -59,14 +59,14 @@ Mermaid Diagram (Standard):
 
 ```mermaid
 flowchart TD
-    A[Caller: Viewer.addSplatScene<br/>src/Viewer.js#addSplatScene] --> B[downloadAndBuildSingleSplatSceneStandardLoad<br/>src/Viewer.js]
-    B --> C[downloadSplatSceneToSplatBuffer<br/>src/Viewer.js]
-    C -->|returns splatBuffer| D[buildSection(splatBuffer, first, final)<br/>src/Viewer.js]
-    D --> E[addSplatBuffers<br/>src/Viewer.js]
-    E --> F[addSplatBuffersToMesh<br/>src/splatmesh/SplatMesh.js]
-    F --> G{setup sort worker?<br/>src/Viewer.js}
-    G -->|yes| H[setupSortWorker<br/>src/Viewer.js]
-    G -->|no| I[runSplatSort<br/>src/Viewer.js]
+    A[Caller: Viewer.addSplatScene\nsrc/Viewer.js#addSplatScene] --> B[downloadAndBuildSingleSplatSceneStandardLoad\nsrc/Viewer.js]
+    B --> C[downloadSplatSceneToSplatBuffer\nsrc/Viewer.js]
+    C -->|splatBuffer| D[buildSection\nsrc/Viewer.js]
+    D --> E[addSplatBuffers\nsrc/Viewer.js]
+    E --> F[addSplatBuffersToMesh\nsrc/splatmesh/SplatMesh.js]
+    F --> G{setup sort worker?\nsrc/Viewer.js}
+    G -->|yes| H[setupSortWorker\nsrc/Viewer.js]
+    G -->|no| I[runSplatSort\nsrc/Viewer.js]
     H --> I
     I --> J[ready to render]
 ```
@@ -133,21 +133,21 @@ Mermaid Diagram (Progressive):
 
 ```mermaid
 flowchart TD
-    A[Caller: Viewer.addSplatScene<br/>src/Viewer.js#addSplatScene] --> B[downloadAndBuildSingleSplatSceneProgressiveLoad<br/>src/Viewer.js]
-    B --> C[downloadSplatSceneToSplatBuffer (progressive)<br/>src/Viewer.js]
-    C --> D[onProgressiveLoadSectionProgress enqueues build<br/>src/Viewer.js]
-    D --> E[checkAndBuildProgressiveLoadSections<br/>src/Viewer.js]
-    E --> F[buildSection(splatBuffer, first/final)<br/>src/Viewer.js]
-    F --> G[addSplatBuffers<br/>src/Viewer.js]
-    G --> H[addSplatBuffersToMesh<br/>src/splatmesh/SplatMesh.js]
-    H --> I{setup sort worker?<br/>src/Viewer.js}
-    I -->|yes| J[setupSortWorker<br/>src/Viewer.js]
-    I -->|no| K[runSplatSort<br/>src/Viewer.js]
+    A[Caller: Viewer.addSplatScene\nsrc/Viewer.js#addSplatScene] --> B[downloadAndBuildSingleSplatSceneProgressiveLoad\nsrc/Viewer.js]
+    B --> C[downloadSplatSceneToSplatBuffer\nprogressive mode\nsrc/Viewer.js]
+    C --> D[onProgressiveLoadSectionProgress\nenqueue build\nsrc/Viewer.js]
+    D --> E[checkAndBuildProgressiveLoadSections\nsrc/Viewer.js]
+    E --> F[buildSection\nsrc/Viewer.js]
+    F --> G[addSplatBuffers\nsrc/Viewer.js]
+    G --> H[addSplatBuffersToMesh\nsrc/splatmesh/SplatMesh.js]
+    H --> I{setup sort worker?\nsrc/Viewer.js}
+    I -->|yes| J[setupSortWorker\nsrc/Viewer.js]
+    I -->|no| K[runSplatSort\nsrc/Viewer.js]
     J --> K
     K --> L{first section?}
-    L -->|yes| M[resolve first-section promise<br/>(returned to caller)]
+    L -->|yes| M[resolve first-section promise\nreturned to caller]
     L -->|no| N{final section?}
-    N -->|yes| O[resolve overall promise<br/>Viewer internal]
+    N -->|yes| O[resolve overall promise\nViewer internal]
     N -->|no| E
 ```
 
