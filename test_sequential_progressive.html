@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequential Progressive Loading Test</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./build/demo/lib/three.module.js",
+                "@mkkellogg/gaussian-splats-3d": "./build/demo/lib/gaussian-splats-3d.module.js"
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background: #005a9e;
+        }
+        .button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #111;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #1a4d1a;
+            border: 1px solid #2d7d2d;
+        }
+        .status.error {
+            background: #4d1a1a;
+            border: 1px solid #7d2d2d;
+        }
+        .status.info {
+            background: #1a1a4d;
+            border: 1px solid #2d2d7d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sequential Progressive Loading Test</h1>
+        
+        <div class="test-section">
+            <h2>Test 1: Sequential Progressive Loading</h2>
+            <p>Load multiple scenes sequentially, each with progressive loading enabled.</p>
+            <button id="testSequential" class="button">Run Sequential Progressive Test</button>
+            <div id="status1" class="status info">Ready to test</div>
+            <div id="log1" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Concurrent Loading (Should Fail)</h2>
+            <p>Try to load multiple scenes concurrently - this should be blocked.</p>
+            <button id="testConcurrent" class="button">Run Concurrent Test</button>
+            <div id="status2" class="status info">Ready to test</div>
+            <div id="log2" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Mixed Loading Strategies</h2>
+            <p>Load first scene progressively, then remaining scenes non-progressively.</p>
+            <button id="testMixed" class="button">Run Mixed Strategy Test</button>
+            <div id="status3" class="status info">Ready to test</div>
+            <div id="log3" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Clear All Scenes</h2>
+            <p>Remove all loaded scenes to start fresh.</p>
+            <button id="clearScenes" class="button">Clear All Scenes</button>
+            <div id="status4" class="status info">Ready to clear</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+        // Initialize viewer
+        const viewer = new GaussianSplats3D.Viewer({
+            'cameraUp': [0, -1, -.17],
+            'initialCameraPosition': [-5, -1, -1],
+            'initialCameraLookAt': [-1.72477, 0.05395, -0.00147],
+            'sphericalHarmonicsDegree': 2,
+            'sceneFadeInRateMultiplier': 1.0
+        });
+
+        // Start the viewer
+        viewer.start();
+
+        // Test scene paths (adjust these to your actual scene files)
+        const testScenes = [
+            'assets/data/flod/garden/lod1_shell0.ksplat',
+            'assets/data/flod/garden/lod1_shell1.ksplat',
+            'assets/data/flod/garden/lod1_shell2.ksplat'
+        ];
+
+        // Utility functions
+        function log(elementId, message) {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function setStatus(elementId, message, type = 'info') {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+
+        // Test 1: Sequential Progressive Loading
+        document.getElementById('testSequential').addEventListener('click', async () => {
+            const button = document.getElementById('testSequential');
+            const logId = 'log1';
+            const statusId = 'status1';
+            
+            button.disabled = true;
+            setStatus(statusId, 'Running sequential progressive test...', 'info');
+            log(logId, 'Starting sequential progressive loading test...');
+            
+            try {
+                for (let i = 0; i < testScenes.length; i++) {
+                    const scenePath = testScenes[i];
+                    log(logId, `Loading scene ${i + 1}/${testScenes.length}: ${scenePath}`);
+                    
+                    const startTime = performance.now();
+                    await viewer.addSplatScene(scenePath, { progressiveLoad: true });
+                    const endTime = performance.now();
+                    
+                    log(logId, `Scene ${i + 1} loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                    log(logId, `Total scenes: ${viewer.getSceneCount()}`);
+                }
+                
+                setStatus(statusId, `Success! Loaded ${testScenes.length} scenes sequentially with progressive loading`, 'success');
+                log(logId, 'Sequential progressive loading test completed successfully!');
+                
+            } catch (error) {
+                setStatus(statusId, `Error: ${error.message}`, 'error');
+                log(logId, `Error: ${error.message}`);
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // Test 2: Concurrent Loading (Should Fail)
+        document.getElementById('testConcurrent').addEventListener('click', async () => {
+            const button = document.getElementById('testConcurrent');
+            const logId = 'log2';
+            const statusId = 'status2';
+            
+            button.disabled = true;
+            setStatus(statusId, 'Testing concurrent loading (should fail)...', 'info');
+            log(logId, 'Starting concurrent loading test...');
+            
+            try {
+                // Start first scene
+                log(logId, 'Starting first scene...');
+                const promise1 = viewer.addSplatScene(testScenes[0], { progressiveLoad: true });
+                
+                // Try to start second scene while first is loading
+                log(logId, 'Attempting to start second scene while first is loading...');
+                const promise2 = viewer.addSplatScene(testScenes[1], { progressiveLoad: true });
+                
+                // Wait for both (this should not reach here)
+                await Promise.all([promise1, promise2]);
+                
+                setStatus(statusId, 'Unexpected: Concurrent loading succeeded (this should not happen)', 'error');
+                log(logId, 'ERROR: Concurrent loading was not blocked!');
+                
+            } catch (error) {
+                if (error.message.includes('Cannot add splat scene while another load')) {
+                    setStatus(statusId, 'Success: Concurrent loading properly blocked', 'success');
+                    log(logId, 'SUCCESS: Concurrent loading was properly blocked');
+                    log(logId, `Error message: ${error.message}`);
+                } else {
+                    setStatus(statusId, `Unexpected error: ${error.message}`, 'error');
+                    log(logId, `Unexpected error: ${error.message}`);
+                }
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // Test 3: Mixed Loading Strategies
+        document.getElementById('testMixed').addEventListener('click', async () => {
+            const button = document.getElementById('testMixed');
+            const logId = 'log3';
+            const statusId = 'status3';
+            
+            button.disabled = true;
+            setStatus(statusId, 'Running mixed strategy test...', 'info');
+            log(logId, 'Starting mixed loading strategy test...');
+            
+            try {
+                // Load first scene progressively
+                log(logId, 'Loading first scene progressively...');
+                const startTime1 = performance.now();
+                await viewer.addSplatScene(testScenes[0], { progressiveLoad: true });
+                const endTime1 = performance.now();
+                log(logId, `First scene loaded progressively in ${(endTime1 - startTime1).toFixed(2)}ms`);
+                
+                // Load remaining scenes non-progressively
+                log(logId, 'Loading remaining scenes non-progressively...');
+                const remainingScenes = testScenes.slice(1).map(path => ({
+                    path: path,
+                    progressiveLoad: false
+                }));
+                
+                const startTime2 = performance.now();
+                await viewer.addSplatScenes(remainingScenes);
+                const endTime2 = performance.now();
+                log(logId, `Remaining scenes loaded non-progressively in ${(endTime2 - startTime2).toFixed(2)}ms`);
+                
+                setStatus(statusId, `Success! Mixed strategy completed. Total scenes: ${viewer.getSceneCount()}`, 'success');
+                log(logId, 'Mixed loading strategy test completed successfully!');
+                
+            } catch (error) {
+                setStatus(statusId, `Error: ${error.message}`, 'error');
+                log(logId, `Error: ${error.message}`);
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // Test 4: Clear All Scenes
+        document.getElementById('clearScenes').addEventListener('click', async () => {
+            const button = document.getElementById('clearScenes');
+            const statusId = 'status4';
+            
+            button.disabled = true;
+            setStatus(statusId, 'Clearing all scenes...', 'info');
+            
+            try {
+                const sceneCount = viewer.getSceneCount();
+                for (let i = sceneCount - 1; i >= 0; i--) {
+                    await viewer.removeSplatScene(i);
+                }
+                
+                setStatus(statusId, `Success! Cleared ${sceneCount} scenes`, 'success');
+                
+            } catch (error) {
+                setStatus(statusId, `Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // Initialize
+        console.log('Sequential Progressive Loading Test initialized');
+        console.log('Viewer created with scene count:', viewer.getSceneCount());
+    </script>
+</body>
+</html>
