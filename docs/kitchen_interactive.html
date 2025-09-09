@@ -143,15 +143,16 @@
 
     .dropdown-content {
       display: none;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.95);
       border-radius: var(--radius-md);
       margin-top: 0.5rem;
       padding: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 2px solid var(--accent-color);
       position: relative;
       z-index: 101;
       max-height: 400px;
       overflow-y: auto;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     }
 
     .dropdown-content.show {
@@ -297,9 +298,16 @@
   <script>
     function toggleDropdown() {
       const dropdown = document.getElementById('dropdown-content');
+      const button = document.querySelector('.dropdown-toggle');
+      
       if (dropdown) {
         dropdown.classList.toggle('show');
         console.log('Dropdown toggled, show class:', dropdown.classList.contains('show'));
+        
+        // Visual feedback on button
+        if (button) {
+          button.style.background = dropdown.classList.contains('show') ? '#10b981' : '#06b6d4';
+        }
       } else {
         console.error('Dropdown element not found');
       }
