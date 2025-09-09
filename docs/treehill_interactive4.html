@@ -168,7 +168,8 @@
         cameraUp: [0, -1, -0.17],
         initialCameraPosition: [-5, -1, -1],
         initialCameraLookAt: [-1.72477, 0.05395, -0.00147],
-        freeIntermediateSplatData: true, // 이 줄을 추가합니다.
+        freeIntermediateSplatData: true,
+        sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
       });
       viewerBase.loadingProgressBar.show();
       const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
@@ -214,6 +215,7 @@
           initialCameraPosition: mainViewer.camera.position.toArray(),
           initialCameraLookAt: mainViewer.controls.target.toArray(),
           cameraUp: mainViewer.camera.up.toArray(),
+          sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
         });
         mainViewer.threeScene.add(dropInViewer);
 
