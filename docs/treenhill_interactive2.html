@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>FLoD Demo - Treehill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="js/util.js"></script>
+  <script type="importmap">
+    {
+        "imports": {
+            "three": "./lib/three.module.js",
+            "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        }
+    }
+  </script>
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #06b6d4;
+      --active-color: #10b981;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --background: #000000;
+      --overlay-bg: rgba(0, 0, 0, 0.8);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-md: 0.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--background);
+      height: 100vh;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .controls-overlay {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+
+    .controls-title {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--primary-color);
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .control-key {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.75rem;
+      min-width: 2rem;
+      text-align: center;
+    }
+
+    .control-description {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .controls-overlay {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        font-size: 0.75rem;
+      }
+      
+    }
+  </style>
+</head>
+
+<body>
+  
+
+  <div class="controls-overlay">
+    <div class="controls-title">Controls</div>
+    <div class="control-item">
+      <div class="control-key">WASD</div>
+      <div class="control-description">Move camera</div>
+    </div>
+    <div class="control-item">
+      <div class="control-key">Mouse</div>
+      <div class="control-description">Look around</div>
+    </div>
+    <div class="control-item">
+      <div class="control-key">Scroll</div>
+      <div class="control-description">Zoom in/out</div>
+    </div>
+    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--primary-color);">Level Controls</div>
+      <div class="control-item">
+        <div class="control-key">1-5</div>
+        <div class="control-description">Keyboard: Change level</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: fixed; top: 1rem; left: 1rem; background: rgba(0, 0, 0, 0.7); color: white; padding: 1rem; border-radius: 0.5rem; font-size: 0.875rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); z-index: 100;">
+    <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--primary-color);">Level Selection</div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button id="level-btn-1" onclick="loadLevel(1)" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s ease;">Level 1</button>
+      <button id="level-btn-2" onclick="loadLevel(2)" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s ease;">Level 2</button>
+      <button id="level-btn-3" onclick="loadLevel(3)" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s ease;">Level 3</button>
+      <button id="level-btn-4" onclick="loadLevel(4)" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s ease;">Level 4</button>
+      <button id="level-btn-5" onclick="loadLevel(5)" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s ease;">Level 5</button>
+    </div>
+  </div>
+
+    <script type="module">
+    import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+    const viewer = new GaussianSplats3D.Viewer({
+      'cameraUp': [0, -1, -.17],
+      'initialCameraPosition': [-5, -1, -1],
+      'initialCameraLookAt': [-1.72477, 0.05395, -0.00147],
+      'sphericalHarmonicsDegree': 2,
+      'enableOptionalEffects': true
+    });
+
+    const scenes = {
+      1: { path: 'assets/flod_data/treehill/treehill_level1.ksplat', name: 'Treehill Level 1' },
+      2: { path: 'assets/flod_data/treehill/treehill_level2.ksplat', name: 'Treehill Level 2' },
+      3: { path: 'assets/flod_data/treehill/treehill_level3.ksplat', name: 'Treehill Level 3' },
+      4: { path: 'assets/flod_data/treehill/treehill_level4.ksplat', name: 'Treehill Level 4' },
+      5: { path: 'assets/flod_data/treehill/treehill_level5.ksplat', name: 'Treehill Level 5' }
+    };
+
+    // This demo no longer uses the complex state management from before,
+    // as the two-viewer approach is much simpler.
+    let isLoading = false;
+
+    function updateLevelInfo() {
+        // Simplified: just show level 5 as active.
+        for (let i = 1; i <= 5; i++) {
+            const btn = document.getElementById(`level-btn-${i}`);
+            if (btn) {
+                if (i === 5) {
+                    btn.style.background = 'var(--active-color)';
+                    btn.style.border = '2px solid var(--accent-color)';
+                } else {
+                    btn.style.background = 'var(--primary-color)';
+                    btn.style.border = 'none';
+                }
+            }
+        }
+    }
+
+    async function initialize() {
+        viewer.start();
+        // Keyboard controls are disabled in this simplified version.
+        // document.addEventListener('keydown', handleKeyPress);
+        console.log('Viewer started. Loading initial scene...');
+
+        viewer.loadingProgressBar.show();
+
+        // 1. Load LoD1 (low-res) and wait for it to be fully loaded.
+        // This viewer instance will only ever contain LoD1.
+        const lod1Config = scenes[1];
+        const lod1LoadOptions = {
+            onProgress: (p) => viewer.loadingProgressBar.setProgress(p * 0.5)
+        };
+        // The addSplatScene promise resolves with a SplatScene object
+        const lod1Scene = await viewer.addSplatScene(lod1Config.path, lod1LoadOptions);
+        console.log('LoD1 loaded and rendered.');
+
+        // 2. Create a SECOND, independent viewer for LoD5 (high-res).
+        // This viewer will be added to the same Three.js scene but will manage its own memory.
+        const viewerHighRes = new GaussianSplats3D.DropInViewer({
+            'initialCameraPosition': viewer.camera.position.toArray(),
+            'initialCameraLookAt': viewer.controls.target.toArray(),
+            'cameraUp': viewer.camera.up.toArray(),
+        });
+        viewer.threeScene.add(viewerHighRes);
+
+        // 3. Load LoD5 progressively into the second viewer.
+        // We set its initial opacity to 0 and fade it in as it loads.
+        const lod5Config = scenes[5];
+        const lod5LoadOptions = {
+            progressiveLoad: true,
+            splatAlphaRemovalThreshold: 20,
+            onProgress: (p) => {
+                viewer.loadingProgressBar.setProgress(50 + p * 0.5);
+                // As LoD5 loads, fade it in by increasing its opacity.
+                if (viewerHighRes.splatMesh && viewerHighRes.splatMesh.getSceneCount() > 0) {
+                    viewerHighRes.getSplatScene(0).opacity = p;
+                }
+            }
+        };
+
+        // The promise resolves when the first chunk is loaded and the mesh is ready.
+        const lod5Scene = await viewerHighRes.addSplatScene(lod5Config.path, lod5LoadOptions);
+
+        // Set initial opacity to 0 so it's invisible at the start.
+        lod5Scene.opacity = 0;
+        console.log('LoD5 progressive loading started.');
+
+        // Find the full download promise to await its completion
+        const fullDownloadPromise = Object.values(viewerHighRes.splatSceneDownloadPromises).find(p => p.id && p.id.includes(lod5Config.path));
+        if (fullDownloadPromise) {
+            await fullDownloadPromise.promise;
+        }
+        console.log('LoD5 fully loaded.');
+
+        // 4. Once LoD5 is fully loaded and opaque, remove the LoD1 scene.
+        await viewer.removeSplatScene(0);
+        console.log('LoD1 removed.');
+
+        viewer.loadingProgressBar.hide();
+        console.log('Progressive overlay complete!');
+        updateLevelInfo();
+    }
+
+    initialize();
+
+  </script>
+</body>
+
+</html>

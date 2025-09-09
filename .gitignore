@@ -1,4 +1,41 @@
-dist
-build
-node_modules
-**/*.DS_Store
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+
+# Source code (not needed for GitHub Pages)
+src/
+
+# Build configuration
+package.json
+package-lock.json
+rollup.config.js
+
+# Linting configuration
+.eslintrc.cjs
+stylelintrc.json
+
+# Build utilities
+util/
+convert_all_scenes.sh
+build-lib.sh
+
+# Documentation (optional - you can include these if you want)
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>FLoD Viewer Examples</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --secondary-color: #f8fafc;
+      --accent-color: #06b6d4;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --background: #ffffff;
+      --background-secondary: #f8fafc;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--primary-color);
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--primary-hover);
+    }
+
+    .demo-content {
+      display: block;
+      margin: 20px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .header-content-container {
+      background: var(--background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-width: 1200px;
+      min-width: 350px;
+      margin: auto;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .title {
+      display: flex;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.025em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .title::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .title span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .small-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      padding: 0 2rem;
+      margin-top: 2rem;
+    }
+
+    .content-row {
+      padding: 2rem;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      text-align: center;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .demo-scene-panel {
+      margin: 0;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      width: 280px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-scene-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    .demo-scene-panel.clickable:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .demo-scene-panel-image {
+      width: 100%;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      height: 180px;
+      object-fit: cover;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s ease;
+    }
+
+    .demo-scene-panel.clickable:hover .demo-scene-panel-image {
+      transform: scale(1.05);
+    }
+
+    .demo-scene-button-row {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .demo-scene-button {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--background-secondary);
+      color: var(--text-secondary);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .demo-scene-button:hover {
+      color: var(--text-primary);
+      border-color: var(--primary-color);
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .button {
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      background: transparent;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .button:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .text-input {
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+    }
+
+    .checkbox-input {
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
+      margin: 0;
+      accent-color: var(--primary-color);
+    }
+
+    .splat-panel {
+      margin: 0;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--background);
+      width: 350px;
+      height: 320px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .splat-panel:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .loading-icon {
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      background: var(--primary-color);
+      border-radius: 50%;
+      --_m: conic-gradient(#0000, #000), linear-gradient(#000 0 0) content-box;
+      -webkit-mask: var(--_m);
+      mask: var(--_m);
+      -webkit-mask-composite: source-out;
+      mask-composite: subtract;
+      box-sizing: border-box;
+      animation: ply-load 1s linear infinite;
+    }
+
+    @keyframes ply-load {
+      to {
+        transform: rotate(1turn);
+      }
+    }
+
+    .controls-key {
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--background-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .controls-key-description {
+      text-align: left;
+      padding-left: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .file-ext {
+      border: #bababa 1px solid;
+      border-radius: 3px;
+      background-color: #e6e6e6;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+      margin-left: 3px;
+      margin-right: 3px;
+    }
+
+    .file-ext-small {
+      border: #ababab 1px solid;
+      border-radius: 3px;
+      background-color: #dfdfdf;
+      padding-left: 4px;
+      padding-right: 4px;
+      padding-bottom: 1px;
+      margin-left: 3px;
+      margin-right: 3px;
+    }
+
+    .valid-value-label {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .demo-content {
+        margin: 10px;
+      }
+      
+      .content-row {
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      .demo-scene-panel {
+        width: 100%;
+        max-width: 320px;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+        padding: 1.5rem;
+      }
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Focus styles for accessibility */
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+  </style>
+  <script type="importmap">
+    {
+        "imports": {
+            "three": "./lib/three.module.js",
+            "gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        }
+    }
+  </script>
+  <script>
+    let currentAlphaRemovalThreshold;
+    let currentCameraUpArray;
+    let currentCameraPositionArray;
+    let currentCameraLookAtArray;
+    let currentAntialiased;
+    let current2DScene;
+    let currentSphericalHarmonicsDegree;
+  </script>
+  <script type="module">
+    import * as GaussianSplats3D from 'gaussian-splats-3d';
+    import * as THREE from 'three';
+
+    function fileBufferToSplatBuffer(fileBufferData, format, alphaRemovalThreshold, compressionLevel, sectionSize, sceneCenter, blockSize, bucketSize, outSphericalHarmonicsDegree = 0) {
+      if (format === GaussianSplats3D.SceneFormat.Ply) {
+        return GaussianSplats3D.PlyLoader.loadFromFileData(fileBufferData.data, alphaRemovalThreshold, compressionLevel, true, outSphericalHarmonicsDegree, sectionSize, sceneCenter, blockSize, bucketSize);
+      } else {
+        if (format === GaussianSplats3D.SceneFormat.Splat) {
+          return GaussianSplats3D.SplatLoader.loadFromFileData(fileBufferData.data, alphaRemovalThreshold, compressionLevel, true, sectionSize, sceneCenter, blockSize, bucketSize);
+        } else {
+          return GaussianSplats3D.KSplatLoader.loadFromFileData(fileBufferData.data);
+        }
+      }
+    }
+
+    window.onCompressionLevelChange = function(arg) {
+      const compressionLevel = parseInt(document.getElementById("compressionLevel").value);
+      if (isNaN(compressionLevel) || compressionLevel < 0 || compressionLevel > 2) {
+        return;
+      }
+
+      for (let i = 1; i <= 3; i++) {
+        const element = document.getElementById('advancedCompressionRow' + i);
+        if (compressionLevel === 0) {
+          element.style.display = 'none';
+        } else {
+          element.style.display = '';
+        }
+      }
+    }
+
+    window.onFileChange = function(arg, fileNameLabelID) {
+      const fileNameLabel = document.getElementById(fileNameLabelID);
+      const url = arg.value;
+      let lastForwardSlash = url.lastIndexOf('/');
+      let lastBackwardSlash = url.lastIndexOf('\\');
+      const lastSlash = Math.max(lastForwardSlash, lastBackwardSlash);
+      fileNameLabel.innerHTML = url.substring(lastSlash + 1);
+    }
+
+    let conversionInProgress = false;
+    window.convertPlyFile = function() {
+      if (conversionInProgress) return;
+      const conversionFile = document.getElementById("conversionFile");
+      const compressionLevel = parseInt(document.getElementById("compressionLevel").value);
+      const alphaRemovalThreshold = parseInt(document.getElementById("alphaRemovalThreshold").value);
+      const sphericalHarmonicsDegree = parseInt(document.getElementById("conversionSphericalHarmonicsDegree").value);
+      const sectionSize = 0;
+      let sceneCenterArray = document.getElementById("sceneCenter").value;
+      const blockSize = parseFloat(document.getElementById("blockSize").value);
+      const bucketSize = parseInt(document.getElementById("bucketSize").value);
+
+      sceneCenterArray = sceneCenterArray.split(',');
+  
+      if (sceneCenterArray.length !== 3) {
+        setViewError("Scene center must contain 3 elements.");
+        return;
+      }
+
+      for (let i = 0; i < 3; i++) {
+        sceneCenterArray[i] = parseFloat(sceneCenterArray[i]);
+
+        if (isNaN(sceneCenterArray[i])) {
+          setViewError("Invalid scene center.");
+          return;
+        }
+      }
+  
+      const sceneCenter = new THREE.Vector3().fromArray(sceneCenterArray);
+
+      if (isNaN(compressionLevel) || compressionLevel < 0 || compressionLevel > 2) {
+        setConversionError("Invalid compression level.");
+        return;
+      } else if (isNaN(alphaRemovalThreshold) || alphaRemovalThreshold <0 || alphaRemovalThreshold > 255) {
+        setConversionError("Invalid alpha remval threshold.");
+        return;
+      } else if (isNaN(sphericalHarmonicsDegree) || sphericalHarmonicsDegree < 0 || sphericalHarmonicsDegree > 2) {
+        setConversionError("Invalid SH degree.");
+        return;
+      } else if (isNaN(blockSize) || blockSize < 0.1) {
+        setConversionError("Invalid block size.");
+        return;
+      } else if (isNaN(bucketSize) || bucketSize < 2 || bucketSize > 65536) {
+        setConversionError("Invalid bucket size.");
+        return;
+      } else if (!conversionFile.files[0]) {
+        setConversionError("Please choose a file to convert.");
+        return;
+      }
+
+      setConversionError("");
+      const convertButton = document.getElementById("convertButton");
+
+      const conversionDone = (error) => {
+        if (error) {
+          console.error(error);
+          setConversionError("Could not convert file.");
+        } else {
+          setConversionStatus("Conversion complete!");
+          setConversionLoadingIconVisibility(false);
+          setConversionCheckIconVisibility(true);
+        }
+        convertButton.disabled = false;
+        conversionInProgress = false;
+      }
+
+      try {
+        const fileReader = new FileReader();
+        fileReader.onload = function(){
+          convertButton.disabled = true;
+          setConversionStatus("Parsing file...");
+          setConversionLoadingIconVisibility(true);
+          setConversionCheckIconVisibility(false);
+          const conversionFileName = conversionFile.files[0].name.trim();
+          const format = GaussianSplats3D.LoaderUtils.sceneFormatFromPath(conversionFileName);
+          const fileData = {data: fileReader.result};
+          window.setTimeout(() => {
+            try {
+              const splatBufferPromise = fileBufferToSplatBuffer(fileData, format, alphaRemovalThreshold, compressionLevel,
+                                                                 sectionSize, sceneCenter, blockSize, bucketSize, sphericalHarmonicsDegree);
+              splatBufferPromise.then((splatBuffer) => {
+                GaussianSplats3D.KSplatLoader.downloadFile(splatBuffer, 'converted_file.ksplat');
+                conversionDone();
+              });
+            } catch (e) {
+              conversionDone(e);
+            }
+          }, 100);
+        }
+        conversionInProgress = true;
+        setConversionStatus("Loading file...");
+        setConversionLoadingIconVisibility(true);
+        fileReader.readAsArrayBuffer(conversionFile.files[0]);
+      } catch (e) {
+        conversionDone(e);
+      }
+    }
+
+    function setConversionError(msg) {
+      setConversionLoadingIconVisibility(false);
+      setConversionCheckIconVisibility(false);
+      document.getElementById("conversionStatus").innerHTML = "";
+      document.getElementById("conversionError").innerHTML = msg;
+    }
+
+    function setConversionStatus(msg) {
+      document.getElementById("conversionError").innerHTML = "";
+      document.getElementById("conversionStatus").innerHTML = msg;
+    }
+
+    function setConversionLoadingIconVisibility(visible) {
+      document.getElementById('conversion-loading-icon').style.display = visible ? 'block' : 'none';
+    }
+
+    function setConversionCheckIconVisibility(visible) {
+      document.getElementById('check-icon').style.display = visible ? 'block' : 'none';
+    }
+
+    window.viewSplat = function() {
+
+      const viewFile = document.getElementById("viewFile");
+      const alphaRemovalThreshold = parseInt(document.getElementById("alphaRemovalThresholdView").value);
+
+      let cameraUpArray = document.getElementById("cameraUp").value;
+      let cameraPositionArray = document.getElementById("cameraPosition").value;
+      let cameraLookAtArray = document.getElementById("cameraLookAt").value;
+      let antialiased = document.getElementById("antialiased").checked;
+      let sceneIs2D = document.getElementById("2dScene").checked;
+      let sphericalHarmonicsDegree = parseInt(document.getElementById("viewSphericalHarmonicsDegree").value);
+
+      cameraUpArray = cameraUpArray.split(',');
+      cameraPositionArray = cameraPositionArray.split(',');
+      cameraLookAtArray = cameraLookAtArray.split(',');
+
+      if (!viewFile.files[0]) {
+        setViewError("Please choose a file to view.");
+        return;
+      } else if (isNaN(alphaRemovalThreshold) || alphaRemovalThreshold < 0 || alphaRemovalThreshold > 255) {
+        setViewError("Invalid alpha remval threshold.");
+        return;
+      } else if (isNaN(sphericalHarmonicsDegree) || sphericalHarmonicsDegree < 0 || sphericalHarmonicsDegree > 2) {
+        setViewError("Invalid SH degree.");
+        return;
+      }
+
+      if (cameraUpArray.length !== 3) {
+        setViewError("Camera up must contain 3 elements.");
+        return;
+      }
+
+      if (cameraPositionArray.length !== 3) {
+        setViewError("Camera position must contain 3 elements.");
+        return;
+      }
+
+      if (cameraLookAtArray.length !== 3) {
+        setViewError("Camera look-at must contain 3 elements.");
+        return;
+      }
+
+      for (let i = 0; i < 3; i++) {
+        cameraUpArray[i] = parseFloat(cameraUpArray[i]);
+        cameraPositionArray[i] = parseFloat(cameraPositionArray[i]);
+        cameraLookAtArray[i] = parseFloat(cameraLookAtArray[i]);
+
+        if (isNaN(cameraUpArray[i])) {
+          setViewError("Invalid camera up.");
+          return;
+        }
+
+        if (isNaN(cameraPositionArray[i])) {
+          setViewError("Invalid camera position.");
+          return;
+        }
+
+        if (isNaN(cameraLookAtArray[i])) {
+          setViewError("Invalid camera look-at.");
+          return;
+        }
+      }
+
+      const viewFileName = viewFile.files[0].name.trim();
+      const format = GaussianSplats3D.LoaderUtils.sceneFormatFromPath(viewFileName);
+
+      currentAlphaRemovalThreshold = alphaRemovalThreshold;
+      currentCameraUpArray = cameraUpArray;
+      currentCameraPositionArray = cameraPositionArray;
+      currentCameraLookAtArray = cameraLookAtArray;
+      currentAntialiased = antialiased;
+      current2DScene = sceneIs2D;
+      currentSphericalHarmonicsDegree = sphericalHarmonicsDegree;
+
+      try {
+        const fileReader = new FileReader();
+        fileReader.onload = function(){
+          try {
+           runViewer(fileReader.result, format, alphaRemovalThreshold, cameraUpArray, cameraPositionArray, cameraLookAtArray, antialiased, sceneIs2D, sphericalHarmonicsDegree);
+          } catch (e) {
+            console.error(e);
+            setViewError("Could not view scene.");
+          }
+        }
+        setViewStatus("Loading scene...");
+        fileReader.readAsArrayBuffer(viewFile.files[0]);
+      } catch (e) {
+        console.error(e);
+        setViewError("Could not view scene.");
+      }
+    }
+
+    function setViewError(msg) {
+      setViewLoadingIconVisibility(false);
+      document.getElementById("viewStatus").innerHTML = "";
+      document.getElementById("viewError").innerHTML = msg;
+    }
+
+    function setViewStatus(msg) {
+      setViewLoadingIconVisibility(true);
+      document.getElementById("viewError").innerHTML = "";
+      document.getElementById("viewStatus").innerHTML = msg;
+    }
+
+    function setViewLoadingIconVisibility(visible) {
+      document.getElementById('view-loading-icon').style.display = visible ? 'block' : 'none';
+    }
+  
+    window.addEventListener("popstate", (event) => {
+      if (currentAlphaRemovalThreshold !== undefined) {
+        window.location = 'index.html?art=' + currentAlphaRemovalThreshold + '&cu=' + currentCameraUpArray + "&cp=" + currentCameraPositionArray + "&cla=" + currentCameraLookAtArray + "&aa=" + currentAntialiased + "&2d=" + current2DScene + "&sh=" + currentSphericalHarmonicsDegree;
+      } else {
+        window.location = 'index.html';
+      }
+    });
+
+    function runViewer(splatBufferData, format, alphaRemovalThreshold, cameraUpArray, cameraPositionArray, cameraLookAtArray, antialiased, sceneIs2D, sphericalHarmonicsDegree) {
+      const viewerOptions = {
+        'cameraUp': cameraUpArray,
+        'initialCameraPosition': cameraPositionArray,
+        'initialCameraLookAt': cameraLookAtArray,
+        'halfPrecisionCovariancesOnGPU': false,
+        'antialiased': antialiased || false,
+        'splatRenderMode': sceneIs2D ? GaussianSplats3D.SplatRenderMode.TwoD : GaussianSplats3D.SplatRenderMode.ThreeD,
+        'sphericalHarmonicsDegree': sphericalHarmonicsDegree
+      };
+      const splatBufferOptions = {
+        'splatAlphaRemovalThreshold': alphaRemovalThreshold
+      };
+      const splatBufferPromise = fileBufferToSplatBuffer({data: splatBufferData}, format, alphaRemovalThreshold, 0,
+                                                          undefined, undefined, undefined, undefined, sphericalHarmonicsDegree);
+      splatBufferPromise.then((splatBuffer) => {
+        document.getElementById("demo-content").style.display = 'none';
+        document.body.style.backgroundColor = "#000000";
+        history.pushState("ViewSplat", null);
+        const viewer = new GaussianSplats3D.Viewer(viewerOptions);
+        viewer.addSplatBuffers([splatBuffer], [splatBufferOptions])
+        .then(() => {
+            viewer.start();
+        });
+      });
+    }
+
+  </script>
+  <script>
+    function openDemo(page, params) {
+      let url = page + '.html';
+      if (params && params.length > 0) {
+        let index = 0;
+        for (let param of params) {
+          url += (index === 0 ? "?" : "&");
+          url += param[0] + "=" + param[1];
+          index++;
+        }
+      }
+      window.location = url;
+    }
+    function reset() {
+      window.location = 'index.html';
+    }
+  </script>
+</head>
+
+<body class="body">
+  <div id="demo-content" class="demo-content">
+    <br>
+    <div class="header-content-container">
+      <div class="title">
+        <div style="margin: auto">
+          FLoD with Three.js
+        </div>
+      </div>
+      <div style="padding-left: 20px; padding-right: 20px;">
+        This is a Three.js-based implemetation of a renderer for <a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/">3D Gaussian Splatting for Real-Time Radiance Field Rendering</a>, a technique for generating 3D scenes from 2D images. Their project is CUDA-based and needs to run natively on your machine, but I wanted to build a viewer that was accessible via the web.
+        <br><br>
+        The 3D scenes are stored in a format similar to point clouds and can be viewed, navigated, and interacted with in real-time. This renderer will work with the original <span class="file-ext-small">.ply</span> files generated by the INRIA project. It also accepts both my own custom <span class="file-ext-small">.ksplat</span> files or the standard <span class="file-ext-small">.splat</span> files, which are both trimmed-down versions of the original <span class="file-ext-small">.ply</span>.
+      </div>
+      <br>
+    </div>
+    <br>
+    <div class="header-content-container">
+        <div class="title">
+          <div style="margin: auto; font-size: 14pt;">
+            Demo scenes
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="content-row" style="max-width: 800px; margin:auto; display:flex; align-items: center; justify-content: center;">
+            <div class="demo-scene-panel">
+                <div class="small-title">Garden</div>
+                <img src="assets/images/garden.png" class="demo-scene-panel-image">
+                <div class="demo-scene-button-row">
+                  <div class="demo-scene-button" onclick="openDemo('garden', [['mode', '0']])">Low</div>
+                  <div style="width: 10px;"></div>
+                  <div class="demo-scene-button" onclick="openDemo('garden', [['mode', '1']])">High</div>
+                </div>
+            </div>
+            <div class="demo-scene-panel">
+                <div class="small-title">Truck</div>
+                <img src="assets/images/truck.png" class="demo-scene-panel-image">
+                <div class="demo-scene-button-row">
+                  <div class="demo-scene-button" onclick="openDemo('truck', [['mode', '0']])">Low</div>
+                  <div style="width: 10px;"></div>
+                  <div class="demo-scene-button" onclick="openDemo('truck', [['mode', '1']])">High</div>
+                </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Stump</div>
+              <img src="assets/images/stump.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('stump', [['mode', '0']])">Low</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('stump', [['mode', '1']])">High</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Bonsai</div>
+              <img src="assets/images/bonsai.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('bonsai', [['mode', '0']])">Low</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('bonsai', [['mode', '1']])">High</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Dynamic scenes</div>
+              <img src="assets/images/dynamic_scenes.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('dynamic_scenes', [['mode', '0']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">AR/VR</div>
+              <img src="assets/images/bonsai.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('vr', [['mode', '0']])">Open</div>
+              </div>
+            </div>
+            <!-- FLOD SCENES(lvl5) ADDED HERE -->
+            <div class="demo-scene-panel">
+              <div class="small-title">Kitchen</div>
+              <img src="assets/images/kitchen.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '1']])">1</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '2']])">2</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '3']])">3</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '4']])">4</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('kitchen', [['mode', '5']])">5</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '1']])">1</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '2']])">2</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '3']])">3</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '4']])">4</div>
+                <div style="width: 10px;"></div>
+                <div class="demo-scene-button" onclick="openDemo('treehill', [['mode', '5']])">5</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v1</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive1', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v2</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive2', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v3</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive3', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+            <div class="demo-scene-panel">
+              <div class="small-title">Treehill Interactive v4</div>
+              <img src="assets/images/treehill.png" class="demo-scene-panel-image">
+              <div class="demo-scene-button-row">
+                <div class="demo-scene-button" onclick="openDemo('treehill_interactive4', [['mode', '3']])">Open</div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <br>
+    <div class="header-content-container">
+        <div class="content-row">
+            <div id ="view-panel" class="splat-panel" style="height:400px;">
+                <br>
+                <div class="small-title">View a <span class="file-ext">.ply</span>, <span class="file-ext">.ksplat</span>, or <span class="file-ext-small">.splat</span> file</div>
+                <br>
+                <table style="text-align: left;">
+                    <tr>
+                    <td colspan="2">
+                        <label for="viewFile">
+                        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"><span class="button">Choose file</span></span>
+                        <input type="file" id="viewFile" style="display:none" onchange="window.onFileChange(this, 'viewFileName')">
+                        </label>
+                        <span id="viewFileName" style="padding-left:15px; color: #333333">(No file chosen)</span>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td colspan="2" style="height: 10px;"></td>
+                    </tr>
+                    <td>
+                        Minimum alpha:&nbsp;
+                    </td>
+                    <td>
+                        <input id="alphaRemovalThresholdView" type="text" class="text-input" style="width: 50px" value="1"></input>
+                        <span class="valid-value-label">(1 - 255)</span>
+                    </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Anti-aliased
+                      </td>
+                      <td style="text-align:left;">
+                        <input type="checkbox" id="antialiased" class="checkbox-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        2D scene
+                      </td>
+                      <td style="text-align:left;">
+                        <input type="checkbox" id="2dScene" class="checkbox-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        Camera up:&nbsp;
+                    </td>
+                    <td>
+                        <input id="cameraUp" type="text" class="text-input" style="width: 90px" value="0, 1, 0"></input>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        Camera position:&nbsp;
+                    </td>
+                    <td>
+                        <input id="cameraPosition" type="text" class="text-input" style="width: 90px" value="0, 1, 0"></input>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        Camera look-at:&nbsp;
+                    </td>
+                    <td>
+                        <input id="cameraLookAt" type="text" class="text-input" style="width: 90px" value="1, 0, 0"></input>
+                    </td>
+                    </tr>
+                    <tr>
+                      <td>
+                          SH level:
+                      </td>
+                      <td>
+                          <input id="viewSphericalHarmonicsDegree" type="text" class="text-input" style="width: 50px" value="0"></input>
+                          <span class="valid-value-label">(0, 1, or 2)</span>
+                      </td>
+                      </tr>
+                </table>
+                <br>
+                <span class="button" onclick="window.viewSplat()">View</span>
+                &nbsp;&nbsp;
+                <span class="button" onclick="reset()">Reset</span>
+                <br>
+                <br>
+                <div style="display: flex; flex-direction: row; width: 230px; margin: auto;">
+                    <div style="width: 50px;">
+                        <div id="view-loading-icon" class="loading-icon" style="display: none;">
+                        </div>
+                    </div>
+                    <div id="viewStatus" style="text-align: left; color: #333333; margin-top: 7px; margin-left: 15px; width: 175px"></div>
+                </div>
+                <span id="viewError" style="color: #ff0000"></span>
+            </div>
+      
+            <div id ="conversion-panel" class="splat-panel" style="height:420px;">
+                <br>
+                <span class="small-title">Convert a <span class="file-ext">.ply</span> or <span class="file-ext">.splat</span> to <span class="file-ext">.ksplat</span></span>
+                <br>
+                <br>
+                <table style="text-align: left;">
+                    <tr>
+                    <td colspan="2">
+                        <label for="conversionFile">
+                        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"><span class="button">Choose file</span></span>
+                        <input type="file" id="conversionFile" style="display:none" onchange="window.onFileChange(this, 'conversionFileName')">
+                        </label>
+                        <span id="conversionFileName" style="padding-left:15px; color: #333333">(No file chosen)</span>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td colspan="2" style="height: 10px;"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                          Minimum alpha:&nbsp;
+                      </td>
+                      <td>
+                          <input id="alphaRemovalThreshold" type="text" class="text-input" style="width: 50px" value="1"></input>
+                          <span class="valid-value-label">(1 - 255)</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                          Scene center:&nbsp;
+                      </td>
+                      <td>
+                          <input id="sceneCenter" type="text" class="text-input" style="width: 50px" value="0, 0, 0"></input>
+                      </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        Compression level:
+                    </td>
+                    <td>
+                        <input id="compressionLevel" type="text" class="text-input" style="width: 50px" value="1" onChange="window.onCompressionLevelChange(this);"></input>
+                        <span class="valid-value-label">(0, 1, or 2)</span>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        SH level:
+                    </td>
+                    <td>
+                        <input id="conversionSphericalHarmonicsDegree" type="text" class="text-input" style="width: 50px" value="0"></input>
+                        <span class="valid-value-label">(0, 1, or 2)</span>
+                    </td>
+                    </tr>
+                    <tr id="advancedCompressionRow1">
+                      <td colspan="2" style="font-weight:bold; padding-top:15px; padding-bottom: 5px;">
+                        Advanced compression options
+                      </td>
+                    </tr>
+                    <tr id="advancedCompressionRow2">
+                      <td>
+                        Block size:&nbsp;
+                      </td>
+                      <td>
+                        <input id="blockSize" type="text" class="text-input" style="width: 50px" value="5.0"></input>
+                        <span class="valid-value-label">( >= 0.1 )</span>
+                      </td>
+                    </tr>
+                    <tr id="advancedCompressionRow3">
+                      <td>
+                        Bucket size&nbsp;
+                      </td>
+                      <td>
+                          <input id="bucketSize" type="text" class="text-input" style="width: 50px" value="256"></input>
+                          <span class="valid-value-label">(2 - 65536)</span>
+                      </td>
+                    </tr>
+                </table>
+                <br>
+                <span id="convertButton" class="button" onclick="window.convertPlyFile()">Convert</span>
+                <br>
+                <br>
+                <div style="text-align: center;">
+                <div style="display: flex; flex-direction: row; width: 230px; margin: auto;">
+                    <div style="width: 50px;">
+                        <div id="conversion-loading-icon" class="loading-icon" style="display: none;">
+                        </div>
+                        <div id="check-icon" class="check" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="35px" width="35px" version="1.1" id="Capa_1" viewBox="0 0 17.837 17.837" xml:space="preserve" style="background:#ffffff00;">
+                            <g>
+                                <path style="fill:#00790a;" d="M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27   c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0   L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z"/>
+                            </g>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="conversionStatus" style="text-align: left; color: #333333; margin-top: 7px; margin-left: 15px; width: 175px"></div>
+                </div>
+                </div>
+                <span id="conversionError" style="color: #ff0000"></span>
+            </div>
+
+            <div id ="controls-panel" class="splat-panel" style="height:490px;">
+
+                <br>
+                <span class="small-title">Mouse input</span>
+                <div style="text-align: left;">
+                    <ul>
+                        <li style="margin-bottom:3px;">Left click to set the focal point</li>
+                        <li style="margin-bottom:3px;">Left click and drag to orbit</li>
+                        <li style="margin-bottom:3px;">Right click and drag to pan</li>
+                    </ul>
+                </div>
+                <span class="small-title">Keyboard input</span>
+                <div style="height: 10px"></div>
+                <table>
+                    <tr>
+                        <td><div class ="controls-key">I</div></td>
+                        <td class="controls-key-description">Display debug info panel</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height:1px">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">C</div></td>
+                        <td class="controls-key-description">Toggle mesh cursor</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height:1px">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">U</div></td>
+                        <td class="controls-key-description">Toggle controls orientation marker</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height:1px">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key" style="font-size:13pt; font-weight: bold;">&larr;</div></td>
+                        <td class="controls-key-description">Rotate camera-up counter-clockwise</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height:1px">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key" style="font-size:13pt; font-weight: bold;">&rarr;</div></td>
+                        <td class="controls-key-description">Rotate camera-up clockwise</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="height:1px">
+                      </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">P</div></td>
+                        <td class="controls-key-description">Toggle point-cloud mode</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="height:1px">
+                      </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">O</div></td>
+                        <td class="controls-key-description">Toggle orthographic mode</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="height:1px">
+                      </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">=</div></td>
+                        <td class="controls-key-description">Increase splat scale</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="height:1px">
+                      </td>
+                    </tr>
+                    <tr>
+                        <td><div class ="controls-key">-</div></td>
+                        <td class="controls-key-description">Decrease splat scale</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+</body>
+
+<script>
+   document.body.onload = function () {
+    if (window.location.search) {
+      const tokens = window.location.search.substring(1).split("&");
+      for (token of tokens) {
+        const component = token.split("=");
+        const varName = component[0];
+        if (varName == "art") {
+          currentAlphaRemovalThreshold = component[1];
+          document.getElementById('alphaRemovalThresholdView').value = currentAlphaRemovalThreshold;
+        } else if (varName == "cu") {
+          currentCameraUpArray = component[1];
+          document.getElementById('cameraUp').value = currentCameraUpArray;
+        } else if (varName == "cp") {
+          currentCameraPositionArray = component[1];
+          document.getElementById('cameraPosition').value = currentCameraPositionArray;
+        } else if (varName == "cla") {
+          currentCameraLookAtArray = component[1];
+          document.getElementById('cameraLookAt').value = currentCameraLookAtArray;
+        } else if (varName == "aa") {
+          currentAntialiased = component[1] === 'true' ? true : false;
+          document.getElementById('antialiased').checked = currentAntialiased;
+        } else if (varName == "2d") {
+          current2DScene = component[1] === 'true' ? true : false;
+          document.getElementById('2dScene').checked = current2DScene;
+        }  else if (varName == "sh") {
+          currentSphericalHarmonicsDegree = component[1];
+          document.getElementById('viewSphericalHarmonicsDegree').value = currentSphericalHarmonicsDegree;
+        }
+      }
+    }
+    if (history.state === "ViewSplat") {
+      history.go(-1);
+    }
+  };
+</script>
+
+</html>

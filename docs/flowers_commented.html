@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Standard meta tags for charset, responsive layout, and IE compatibility -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>3D Gaussian Splats - Flowers Scene (Commented)</title>
+
+  <!-- Optional UI font for nicer overlays -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Shared utilities (not strictly required here but kept for parity) -->
+  <script type="text/javascript" src="js/util.js"></script>
+
+  <!-- Import map so the module script can import three and the splats library by name -->
+  <script type="importmap">
+    {
+        "imports": {
+            "three": "./lib/three.module.js",
+            "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        }
+    }
+  </script>
+
+  <!-- Page styling for overlays and controls -->
+  <style>
+    :root {
+      /* Theme tokens for colors and radii */
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #06b6d4;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --background: #000000;
+      --overlay-bg: rgba(0, 0, 0, 0.8);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-md: 0.5rem;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      /* Fullscreen canvas-like background; viewer will render into the document body */
+      background: var(--background);
+      height: 100vh;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;       /* Prevent scrollbars during camera moves */
+      position: relative;     /* Position reference for absolute overlays */
+    }
+
+    /* Full-screen loading veil displayed until first scene finishes loading */
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--overlay-bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 1000;           /* Above everything */
+      transition: opacity 0.5s ease;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
+    /* Simple spinner */
+    .loading-spinner {
+      width: 3rem; height: 3rem;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .loading-text { color: white; font-size: 1.125rem; font-weight: 500; text-align: center; }
+    .loading-subtext { color: rgba(255, 255, 255, 0.7); font-size: 0.875rem; margin-top: 0.5rem; }
+
+    /* Small controls help overlay */
+    .controls-overlay {
+      position: fixed; top: 1rem; right: 1rem;
+      background: rgba(0, 0, 0, 0.7); color: white;
+      padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem;
+      backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+    .controls-title { font-weight: 600; margin-bottom: 0.75rem; color: var(--primary-color); }
+    .control-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .control-key { background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; margin-right: 0.75rem; min-width: 2rem; text-align: center; }
+    .control-description { color: rgba(255, 255, 255, 0.9); }
+
+    /* Scene info label */
+    .scene-info {
+      position: fixed; bottom: 1rem; left: 1rem;
+      background: rgba(0, 0, 0, 0.7); color: white;
+      padding: 1rem; border-radius: var(--radius-md);
+      backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+    .scene-title { font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-color); }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .controls-overlay { top: 0.5rem; right: 0.5rem; left: 0.5rem; font-size: 0.75rem; }
+      .scene-info { bottom: 0.5rem; left: 0.5rem; right: 0.5rem; }
+    }
+
+    /* LOD level button panel */
+    #levelControls {
+      position: absolute; top: 20px; left: 20px; z-index: 1000;
+      background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 8px; color: white; min-width: 200px;
+    }
+    #levelControls h3 { margin: 0 0 15px 0; font-size: 16px; color: #ffd700; }
+
+    .level-button {
+      display: block; width: 100%; margin: 5px 0; padding: 8px 12px;
+      background: #333; color: white; border: 1px solid #555; border-radius: 4px;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .level-button:hover { background: #555; border-color: #777; }
+    .level-button.active { background: #ffd700; color: #000; border-color: #ffd700; }
+    .level-button:disabled { background: #222; color: #666; cursor: not-allowed; border-color: #333; }
+
+    /* Small inline loading indicator used during LOD switches */
+    #loadingIndicator { display: none; color: #ffd700; font-style: italic; margin-top: 10px; text-align: center; }
+
+    /* Current state (level + file) */
+    #info { position: absolute; bottom: 20px; left: 20px; z-index: 1000; background: rgba(0, 0, 0, 0.8); padding: 10px; border-radius: 8px; color: white; font-size: 12px; }
+  </style>
+</head>
+
+<body>
+  <!-- Initial full-screen loading overlay (fades out after first scene loads) -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading 3D Scene</div>
+    <div class="loading-subtext">Please wait while the Gaussian Splat data loads...</div>
+  </div>
+
+  <!-- Small usage control hints -->
+  <div class="controls-overlay">
+    <div class="controls-title">Controls</div>
+    <div class="control-item"><div class="control-key">WASD</div><div class="control-description">Move camera</div></div>
+    <div class="control-item"><div class="control-key">Mouse</div><div class="control-description">Look around</div></div>
+    <div class="control-item"><div class="control-key">Scroll</div><div class="control-description">Zoom in/out</div></div>
+  </div>
+
+  <!-- Scene label -->
+  <div class="scene-info">
+    <div class="scene-title">Flowers Scene</div>
+  </div>
+
+  <!-- Level-of-detail selection UI (buttons 1..5) -->
+  <div id="levelControls">
+    <h3>LOD Level Selection</h3>
+    <button class="level-button" data-level="1">Level 1</button>
+    <button class="level-button" data-level="2">Level 2</button>
+    <button class="level-button" data-level="3">Level 3</button>
+    <button class="level-button" data-level="4">Level 4</button>
+    <!-- Default active: Level 5 -->
+    <button class="level-button active" data-level="5">Level 5</button>
+    <div id="loadingIndicator">Loading...</div>
+  </div>
+
+  <!-- Status panel showing current level and filename -->
+  <div id="info">
+    <div>Current Level: <span id="currentLevel">5</span></div>
+    <div>File: <span id="currentFile">flowers_level5.ksplat</span></div>
+  </div>
+
+  <!-- Main logic in an ES module script -->
+  <script type="module">
+    import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+    // Holds the viewer's handle to the currently displayed scene, so we can remove it later
+    let currentSceneIndex = null;
+    // Prevent concurrent loads / double-clicks
+    let isLoading = false;
+
+    // Create the viewer with initial camera state and SH degree (quality/lighting)
+    const viewer = new GaussianSplats3D.Viewer({
+      'cameraUp': [0, -1, -0.54],
+      'initialCameraPosition': [-3.15634, -0.16946, -0.51552],
+      'initialCameraLookAt': [1.52976, 2.27776, 1.65898],
+      'sphericalHarmonicsDegree': 2
+    });
+
+    // LOD → absolute .ksplat path mapping (this page only uses .ksplat)
+    const levelConfig = {
+      1: { file: 'assets/flod_data/flowers/flowers_level1.ksplat' },
+      2: { file: 'assets/flod_data/flowers/flowers_level2.ksplat' },
+      3: { file: 'assets/flod_data/flowers/flowers_level3.ksplat' },
+      4: { file: 'assets/flod_data/flowers/flowers_level4.ksplat' },
+      5: { file: 'assets/flod_data/flowers/flowers_level5.ksplat' }
+    };
+
+    // Update small status panel with the selected level and filename
+    function updateInfo(level) {
+      const config = levelConfig[level];
+      document.getElementById('currentLevel').textContent = level;
+      document.getElementById('currentFile').textContent = config.file.split('/').slice(-1)[0];
+    }
+
+    // Toggle the "active" class on the correct LOD button
+    function setActiveButton(level) {
+      document.querySelectorAll('.level-button').forEach(btn => { btn.classList.remove('active'); });
+      const selectedBtn = document.querySelector(`[data-level="${level}"]`);
+      if (selectedBtn) { selectedBtn.classList.add('active'); }
+    }
+
+    // Show/hide small inline loading text and disable/enable buttons during load
+    function setLoadingState(loading) {
+      isLoading = loading;
+      const indicator = document.getElementById('loadingIndicator');
+      const buttons = document.querySelectorAll('.level-button');
+      if (loading) { indicator.style.display = 'block'; buttons.forEach(btn => btn.disabled = true); }
+      else { indicator.style.display = 'none'; buttons.forEach(btn => btn.disabled = false); }
+    }
+
+    // Core: load a new LOD scene without showing a blank frame
+    // Strategy: add new scene first; once ready, remove previous scene, then update UI
+    async function loadLevel(level) {
+      // Block re-entry and ignore same-level clicks
+      if (isLoading) return;
+      const activeBtn = document.querySelector('.level-button.active');
+      const activeLevel = activeBtn ? parseInt(activeBtn.dataset.level) : null;
+      if (activeLevel !== null && level === activeLevel) return;
+
+      setLoadingState(true);
+      try {
+        const config = levelConfig[level];
+        const path = config.file;  // .ksplat path for the requested LOD
+        console.log(`Loading level ${level} from: ${path}`);
+
+        // Keep previous index to remove it after the new one is ready
+        const previousSceneIndex = currentSceneIndex;
+
+        // Add the new scene and wait for it to be ready
+        const newSceneIndex = await viewer.addSplatScene(path, { 'progressiveLoad': false });
+
+        // Now remove the previous scene to avoid a blank frame during the handoff
+        if (previousSceneIndex !== null) { viewer.removeSplatScene(previousSceneIndex, false); }
+
+        // Commit the new scene as current
+        currentSceneIndex = newSceneIndex;
+        setActiveButton(level);
+        updateInfo(level);
+        console.log(`Successfully loaded level ${level}`);
+      } catch (error) {
+        console.error(`Failed to load level ${level}:`, error);
+        alert(`Failed to load level ${level}. Please ensure the file exists.`);
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    // Wire button clicks to LOD loads
+    document.querySelectorAll('.level-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const level = parseInt(btn.dataset.level);
+        loadLevel(level);
+      });
+    });
+
+    // Initial scene load based on the button marked as active (defaults to level 5)
+    const initialActiveBtn = document.querySelector('.level-button.active');
+    const initialLevel = initialActiveBtn ? parseInt(initialActiveBtn.dataset.level) : 5;
+    const initialPath = levelConfig[initialLevel].file;
+
+    viewer.addSplatScene(initialPath, { 'progressiveLoad': false })
+      .then((sceneIndex) => {
+        // After first scene is ready, fade out and hide the full-screen loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        loadingOverlay.classList.add('hidden');
+        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+
+        currentSceneIndex = sceneIndex;  // Remember the new scene index for later removal
+        viewer.start();                   // Start the render loop
+        updateInfo(initialLevel);         // Show status for the initial LOD
+      })
+      .catch((error) => {
+        console.error('Failed to load initial scene:', error);
+        // Show user-friendly error in the overlay and keep it visible
+        document.querySelector('.loading-text').textContent = 'Error loading scene';
+        document.querySelector('.loading-subtext').textContent = 'Please refresh the page to try again';
+        alert('Failed to load initial scene. Please check the console for details.');
+      });
+  </script>
+</body>
+
+</html>
