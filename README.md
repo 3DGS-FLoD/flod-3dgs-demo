@@ -6,6 +6,7 @@ This is a Three.js-based web implementation demonstrating [FLoD-3DGS](https://3d
 
 [![arXiv](https://img.shields.io/badge/arXiv-2408.128894-b31b1b.svg)](https://arxiv.org/abs/2408.12894) 
 [![Project Page](https://img.shields.io/badge/Visit-Project_Page-007ec6.svg)](https://3dgs-flod.github.io/flod/)
+[![Code](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/3DGS-FLoD/flod)
 
 ## Overview
 
