@@ -29,7 +29,6 @@ This implementation is based on [Mark Kellogg's Three.js Gaussian Splatting libr
     - WASM splat sort: Implemented in C++ using WASM SIMD instructions
     - Partially GPU accelerated splat sort: Uses transform feedback to pre-calculate splat distances
 
-<br>
 
 ## Controls
 Mouse
@@ -71,7 +70,6 @@ Keyboard
 
 This web demo is based on [Mark Kellogg's Three.js Gaussian Splatting library](https://github.com/mkkellogg/GaussianSplats3D). 
 
-<br>
 <br>
 
 ## FLoD Citation
