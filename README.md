@@ -1,4 +1,4 @@
-# [FLoD-3DGS Demo](https://3dgs-flod.github.io/flod-3dgs-demo/) - Web-based Interactive Viewer
+# FLoD-3DGS Demo [(go)](https://3dgs-flod.github.io/flod-3dgs-demo/) - Web-based Interactive Viewer
 
 **FLoD: Integrating Flexible Level of Detail into 3D Gaussian Splatting for Customizable Rendering**
 
