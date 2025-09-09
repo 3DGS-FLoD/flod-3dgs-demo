@@ -41,7 +41,6 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: var(--text-primary);
       line-height: 1.6;
-      padding: 20px 0;
     }
 
     a {
@@ -71,8 +70,6 @@
       margin: auto;
       overflow: hidden;
       border: 1px solid var(--border-color);
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.95);
     }
 
     .title {
@@ -87,18 +84,6 @@
       letter-spacing: -0.025em;
       position: relative;
       overflow: hidden;
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .title::before {
@@ -143,19 +128,13 @@
       color: var(--text-primary);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.9);
-      width: 320px;
+      background: var(--background);
+      width: 280px;
       transition: all 0.3s ease;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-sm);
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(10px);
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
     }
-
-    .demo-scene-panel:nth-child(1) { animation-delay: 0.1s; }
-    .demo-scene-panel:nth-child(2) { animation-delay: 0.2s; }
 
     .demo-scene-panel::before {
       content: '';
@@ -168,11 +147,10 @@
     }
 
     .demo-scene-panel.clickable:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
       border-color: var(--primary-color);
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.95);
     }
 
     .demo-scene-panel-image {
@@ -201,22 +179,20 @@
     .demo-scene-button {
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-color);
-      background: linear-gradient(135deg, var(--background-secondary) 0%, #f1f5f9 100%);
+      background: var(--background-secondary);
       color: var(--text-secondary);
       padding: 0.5rem 1rem;
       font-size: 0.875rem;
       font-weight: 500;
       transition: all 0.2s ease;
       cursor: pointer;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
     }
 
     .demo-scene-button:hover {
-      color: white;
+      color: var(--text-primary);
       border-color: var(--primary-color);
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      background: var(--primary-color);
+      color: white;
     }
 
     /* Responsive design */
