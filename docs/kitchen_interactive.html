@@ -134,6 +134,7 @@
       margin-top: 0.75rem;
       width: 100%;
       transition: all 0.2s ease;
+      display: block;
     }
 
     .dropdown-toggle:hover {
@@ -147,6 +148,10 @@
       margin-top: 0.5rem;
       padding: 1rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 101;
+      max-height: 400px;
+      overflow-y: auto;
     }
 
     .dropdown-content.show {
@@ -292,7 +297,12 @@
   <script>
     function toggleDropdown() {
       const dropdown = document.getElementById('dropdown-content');
-      dropdown.classList.toggle('show');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        console.log('Dropdown toggled, show class:', dropdown.classList.contains('show'));
+      } else {
+        console.error('Dropdown element not found');
+      }
     }
   </script>
 
