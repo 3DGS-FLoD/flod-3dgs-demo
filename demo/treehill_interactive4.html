@@ -6,6 +6,8 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>FLoD Demo - Treehill</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
@@ -16,7 +18,7 @@
     {
       "imports": {
         "three": "./lib/three.module.js",
-        "gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
       }
     }
   </script>
@@ -157,8 +159,7 @@
   </div>
 
   <script type="module">
-    import * as GaussianSplats3D from 'gaussian-splats-3d';
-    import * as THREE from 'three';
+    import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
 
     async function main() {
       console.log("Initializing basic viewer for LoD1...");

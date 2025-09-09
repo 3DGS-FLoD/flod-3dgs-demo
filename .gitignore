@@ -21,9 +21,6 @@ util/
 convert_all_scenes.sh
 build-lib.sh
 
-# Documentation (optional - you can include these if you want)
-*.md
-
 # OS files
 .DS_Store
 Thumbs.db
