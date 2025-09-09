@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>FLoD Demo - Kitchen</title>
+  <title>Kitchen</title>
 
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
@@ -321,7 +321,6 @@
     async function main() {
       console.log("Initializing basic viewer for LoD1...");
 
-      // 1. Base viewer + LoD1
       const viewerBase = new GaussianSplats3D.Viewer({
         cameraUp: [0, -1, -0.17],
         initialCameraPosition: [-5, -1, -1],
@@ -404,35 +403,27 @@
 
         console.log("Promoting new LoD to main viewer...");
 
-        // --- Step 1: Remove the OLD LOD from mainViewer ---
-        // 이 단계가 새로운 SplatBuffer를 입양하기 전에 반드시 발생해야 합니다.
-        // 그렇지 않으면 새로 입양된 버퍼를 해제해버릴 수 있습니다.
         if (mainViewer.getSceneCount() > 0) {
             await mainViewer.removeSplatScene(0, { dispose: true });
             console.log("Old LoD removed from main viewer.");
         }
 
-        // --- Step 2: Adopt the NEW LOD's SplatBuffer from dropInViewer into mainViewer ---
         const adoptedSplatBuffer = dropInViewer.getSplatScene(0).splatBuffer;
         await mainViewer.addSplatBuffers([adoptedSplatBuffer]);
         console.log("New LoD adopted by main viewer.");
 
-        // --- Step 3: Cleanup dropInViewer ---
-        // 중요: dropInViewer가 adoptedSplatBuffer를 해제하지 않도록 참조를 끊어줍니다.
-        // 이제 mainViewer가 이 버퍼의 소유권을 가집니다.
         const dropInScene = dropInViewer.getSplatScene(0);
         if (dropInScene) {
-            dropInScene.splatBuffer = null; // 핵심: 참조 끊기
+            dropInScene.splatBuffer = null;
             console.log("SplatBuffer detached from dropInViewer.");
         }
         dropInViewer.removeFromParent();
         await dropInViewer.dispose();
         console.log("Drop-in viewer disposed.");
 
-        return mainViewer; // 업데이트된 mainViewer를 반환합니다.
+        return mainViewer; 
       }
       
-      // Initial LoD1 -> LoD3 load
       currentActiveViewer = await loadAndPromoteLoD(
         ksplatUrl(3),
         viewerBase
