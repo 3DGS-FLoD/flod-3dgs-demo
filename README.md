@@ -1,8 +1,8 @@
-# FLoD-3DGS Demo - Web-based Interactive Viewer
+# [FLoD-3DGS Demo](https://3dgs-flod.github.io/flod-3dgs-demo/) - Web-based Interactive Viewer
 
 **FLoD: Integrating Flexible Level of Detail into 3D Gaussian Splatting for Customizable Rendering**
 
-This is a Three.js-based web implementation demonstrating [FLoD-3DGS](https://3dgs-flod.github.io/flod/), a research project that integrates flexible level of detail into 3D Gaussian Splatting.
+This is a Three.js-based web implementation demonstrating FLoD-3DGS, a research project that integrates flexible level of detail into 3D Gaussian Splatting.
 
 [![arXiv](https://img.shields.io/badge/arXiv-2408.128894-b31b1b.svg)](https://arxiv.org/abs/2408.12894) 
 [![Project Page](https://img.shields.io/badge/Visit-Project_Page-007ec6.svg)](https://3dgs-flod.github.io/flod/)
