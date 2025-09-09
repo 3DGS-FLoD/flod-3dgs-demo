@@ -6,8 +6,6 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>FLoD Demo - Treehill</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
@@ -18,7 +16,7 @@
     {
       "imports": {
         "three": "./lib/three.module.js",
-        "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        "gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
       }
     }
   </script>
@@ -159,7 +157,8 @@
   </div>
 
   <script type="module">
-    import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+    import * as GaussianSplats3D from 'gaussian-splats-3d';
+    import * as THREE from 'three';
 
     async function main() {
       console.log("Initializing basic viewer for LoD1...");
@@ -169,10 +168,14 @@
         cameraUp: [0, -1, -0.17],
         initialCameraPosition: [-5, -1, -1],
         initialCameraLookAt: [-1.72477, 0.05395, -0.00147],
-        freeIntermediateSplatData: true, // 이 줄을 추가합니다.
+        freeIntermediateSplatData: true,
+        sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
       });
       viewerBase.loadingProgressBar.show();
-      await viewerBase.addSplatScene("assets/flod_data/kitchen/kitchen_level1.ksplat", {
+      const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
+      const ksplatUrl = (level) => `${HF_BASE}treehill_level${level}.ksplat`;
+
+      await viewerBase.addSplatScene(ksplatUrl(1), {
         onProgress: (p) => viewerBase.loadingProgressBar.setProgress(p * 0.5),
       });
       await viewerBase.start();
@@ -185,11 +188,11 @@
       let currentActiveViewer = viewerBase;
 
       const lodPaths = {
-        1: "assets/flod_data/kitchen/kitchen_level1.ksplat",
-        2: "assets/flod_data/kitchen/kitchen_level2.ksplat",
-        3: "assets/flod_data/kitchen/kitchen_level3.ksplat",
-        4: "assets/flod_data/kitchen/kitchen_level4.ksplat",
-        5: "assets/flod_data/kitchen/kitchen_level5.ksplat",
+        1: ksplatUrl(1),
+        2: ksplatUrl(2),
+        3: ksplatUrl(3),
+        4: ksplatUrl(4),
+        5: ksplatUrl(5),
       };
 
       function setLevelButtonsEnabled(enabled) {
@@ -212,6 +215,7 @@
           initialCameraPosition: mainViewer.camera.position.toArray(),
           initialCameraLookAt: mainViewer.controls.target.toArray(),
           cameraUp: mainViewer.camera.up.toArray(),
+          sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
         });
         mainViewer.threeScene.add(dropInViewer);
 
@@ -272,7 +276,7 @@
       
       // Initial LoD1 -> LoD3 load
       currentActiveViewer = await loadAndPromoteLoD(
-        "assets/flod_data/kitchen/kitchen_level5.ksplat",
+        ksplatUrl(3),
         viewerBase
       );
       console.log("Initial LoD3 load complete.");
