@@ -428,7 +428,7 @@
         const isSimplePinhole = firstPreset.model === 'SIMPLE_PINHOLE';
         const widthPx = firstPreset.width; const heightPx = firstPreset.height;
         if ((isPinhole && firstPreset.params.length >= 2) || (isSimplePinhole && firstPreset.params.length >= 1)) {
-          const fx = isPinhole ? firstPreset.params[0] : firstPreset.params[0];
+          // const fx = isPinhole ? firstPreset.params[0] : firstPreset.params[0];
           const fy = isPinhole ? firstPreset.params[1] : firstPreset.params[0];
           const cx = isPinhole ? firstPreset.params[2] : firstPreset.params[1];
           const cy = isPinhole ? firstPreset.params[3] : firstPreset.params[2];
@@ -455,43 +455,6 @@
       document.getElementById("level-btn-5").classList.remove("active");
 
       let currentActiveViewer = viewerBase;
-
-      // --- Camera preset utilities (for DropInViewer adoption flows) ---
-      function qvec2rotmat(qvec) {
-        return [
-          [1 - 2*qvec[2]*qvec[2] - 2*qvec[3]*qvec[3], 2*qvec[1]*qvec[2] - 2*qvec[0]*qvec[3], 2*qvec[3]*qvec[1] + 2*qvec[0]*qvec[2]],
-          [2*qvec[1]*qvec[2] + 2*qvec[0]*qvec[3], 1 - 2*qvec[1]*qvec[1] - 2*qvec[3]*qvec[3], 2*qvec[2]*qvec[3] - 2*qvec[0]*qvec[1]],
-          [2*qvec[3]*qvec[1] - 2*qvec[0]*qvec[2], 2*qvec[2]*qvec[3] + 2*qvec[0]*qvec[1], 1 - 2*qvec[1]*qvec[1] - 2*qvec[2]*qvec[2]]
-        ];
-      }
-      function applyCameraPresetToViewer(viewer, preset) {
-        if (!preset) return;
-        viewer.camera.position.set(preset.position[0], preset.position[1], preset.position[2]);
-        viewer.controls.target.set(preset.lookAt[0], preset.lookAt[1], preset.lookAt[2]);
-        const R = qvec2rotmat(preset.qvec);
-        const Rt = [[R[0][0], R[1][0], R[2][0]], [R[0][1], R[1][1], R[2][1]], [R[0][2], R[1][2], R[2][2]]];
-        const upWorld = new THREE.Vector3(-Rt[0][1], -Rt[1][1], -Rt[2][1]);
-        viewer.camera.up.copy(upWorld).normalize();
-        viewer.camera.lookAt(preset.lookAt[0], preset.lookAt[1], preset.lookAt[2]);
-        const isPinhole = preset.model === 'PINHOLE';
-        const isSimplePinhole = preset.model === 'SIMPLE_PINHOLE';
-        const widthPx = preset.width; const heightPx = preset.height;
-        if ((isPinhole && preset.params.length >= 2) || (isSimplePinhole && preset.params.length >= 1)) {
-          const fx = isPinhole ? preset.params[0] : preset.params[0];
-          const fy = isPinhole ? preset.params[1] : preset.params[0];
-          const cx = isPinhole ? preset.params[2] : preset.params[1];
-          const cy = isPinhole ? preset.params[3] : preset.params[2];
-          const fovY = 2 * Math.atan((heightPx / 2) / fy);
-          const fovYDeg = (fovY * 180) / Math.PI;
-          viewer.camera.fov = fovYDeg;
-          viewer.camera.aspect = widthPx / heightPx;
-          viewer.camera.clearViewOffset();
-          const offsetX = (widthPx / 2) - cx; const offsetY = (heightPx / 2) - cy;
-          viewer.camera.setViewOffset(widthPx, heightPx, offsetX, offsetY, widthPx, heightPx);
-          viewer.camera.updateProjectionMatrix();
-        }
-        viewer.controls.update();
-      }
 
       const lodPaths = {
         1: ksplatUrl(1),
