@@ -3,7 +3,7 @@
 
 <!-- Last updated time variable -->
 <script>
-  const LAST_UPDATED_TIME = "Sep 12, 2025, 02:07 PM KST";
+  const LAST_UPDATED_TIME = "Sep 12, 2025, 02:15 PM KST";
 </script>
 
 <head>
@@ -767,8 +767,13 @@
 </body>
 
   <script>
+    function updateLastUpdated() {
+      document.getElementById('last-updated').textContent = LAST_UPDATED_TIME;
+    }
 
-document.body.onload = function () {
+    document.addEventListener('DOMContentLoaded', updateLastUpdated);
+
+    document.body.onload = function () {
     if (window.location.search) {
       const tokens = window.location.search.substring(1).split("&");
       for (token of tokens) {
