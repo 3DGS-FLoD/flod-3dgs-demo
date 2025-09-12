@@ -182,12 +182,40 @@
         flex: 0 1 calc((100% - 1rem) / 3); /* 2 * 0.5rem gap */
         text-align: center;
     }
+    /* Scoped details styling for controls overlay */
+    .controls-overlay details {
+      margin-top: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.375rem;
+      overflow: hidden;
+      transition: background-color 0.2s;
+    }
+    .controls-overlay details[open] {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .controls-overlay summary {
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--primary-color);
+      list-style: none;
+      position: relative;
+      text-align: center;
+    }
+    .controls-overlay summary::-webkit-details-marker { display: none; }
+    .controls-overlay .controls-content {
+      padding: 0.65rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
   </style>
 </head>
 
 <body>
   <div class="controls-overlay">
-    <div class="controls-title">Controls</div>
     <details>
       <summary>Controls</summary>
       <div class="controls-content">
