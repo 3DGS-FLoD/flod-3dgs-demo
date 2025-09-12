@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <title>FLoD Demo - Treehill Interactive 9</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <script type="text/javascript" src="js/util.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./lib/three.module.js",
+        "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #06b6d4;
+      --active-color: #10b981;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --background: #000000;
+      --overlay-bg: rgba(0, 0, 0, 0.8);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-md: 0.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--background);
+      height: 100vh;
+      margin: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .controls-overlay {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+
+    .controls-title {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--primary-color);
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .control-key {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.75rem;
+      min-width: 2rem;
+      text-align: center;
+    }
+
+    .control-description {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .level-selection-overlay {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+
+    .level-button {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.2rem 0.5rem; /* 세로/가로 여백 */
+      border: 2px solid transparent; /* 크기 고정을 위해 투명 테두리 추가 */
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 0.8125rem; /* 14px -> 13px, 글자 넘침 방지 */
+      transition: all 0.2s ease;
+    }
+
+    .level-button.active {
+      background: var(--active-color);
+      border-color: var(--accent-color); /* 활성화 시 테두리 색상만 변경 */
+    }
+
+    .region-toggle {
+      margin-right: 8px;
+      accent-color: var(--primary-color);
+      transform: scale(1.2);
+    }
+    
+    label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    /* New styles for collapsible sections */
+    #controls-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 300px;
+    }
+    details {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.375rem;
+        overflow: hidden;
+        transition: background-color 0.2s;
+    }
+    details[open] {
+        background: rgba(0,0,0,0.2);
+    }
+    summary {
+        font-weight: 600;
+        padding: 0.375rem 1rem;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-color);
+        list-style: none; /* Remove default triangle */
+        position: relative;
+    }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+    .controls-content {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    #lod-controls, #selective-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    #lod-controls .level-button, #selective-controls .level-button {
+        /* flex-grow: 0으로 설정하여 마지막 줄의 버튼이 늘어나지 않도록 하고, 너비를 3등분합니다. */
+        flex: 0 1 calc((100% - 1rem) / 3); /* 2 * 0.5rem gap */
+        text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls-overlay">
+    <div class="controls-title">Controls</div>
+    <div class="control-item">
+      <div class="control-key">WASD</div>
+      <div class="control-description">Move camera</div>
+    </div>
+    <div class="control-item">
+      <div class="control-key">Mouse</div>
+      <div class="control-description">Look around</div>
+    </div>
+    <div class="control-item">
+      <div class="control-key">Scroll</div>
+      <div class="control-description">Zoom in/out</div>
+    </div>
+  </div>
+
+    <div id="controls-container" class="level-selection-overlay">
+        <details id="lod-details" open>
+            <summary id="lod-summary">Single-Level Rendering</summary>
+            <div id="lod-controls" class="controls-content">
+                <button id="level-btn-1" class="level-button">Level 1</button>
+                <button id="level-btn-2" class="level-button">Level 2</button>
+                <button id="level-btn-3" class="level-button">Level 3</button>
+                <button id="level-btn-4" class="level-button">Level 4</button>
+                <button id="level-btn-5" class="level-button">Level 5</button>
+            </div>
+        </details>
+        <details id="selective-details">
+            <summary id="selective-summary">Selective Rendering</summary>
+            <div id="selective-controls" class="controls-content">
+                <button id="region-btn-1" class="level-button">Level 5</button>
+                <button id="region-btn-2" class="level-button">Level 4</button>
+                <button id="region-btn-3" class="level-button">Level 3</button>
+            </div>
+        </details>
+    </div>
+
+  <script type="module">
+    import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+
+    // --- Global State ---
+    let viewer;
+    let currentMode = 'lod'; // 'lod' or 'selective'
+    let isSwitchingMode = false;
+    let lastActiveLod = 5; // 마지막으로 활성화된 LOD 레벨을 추적합니다.
+
+    const lodPaths = {
+        1: "assets/flod/stump/lod1.ksplat",
+        2: "assets/flod/stump/lod2.ksplat",
+        3: "assets/flod/stump/lod3.ksplat",
+        4: "assets/flod/stump/lod4.ksplat",
+        5: "assets/flod/stump/lod5.ksplat",
+    };
+
+    const selectiveRenderingPaths = {
+        1: [{ path: "assets/flod/stump/lod5_shell0.ksplat" }],
+        2: [{ path: "assets/flod/stump/lod4_shell1.ksplat" }],
+        3: [
+            { path: "assets/flod/stump/lod3_shell2.ksplat" },
+            { path: "assets/flod/stump/lod3_shell3.ksplat" },
+            { path: "assets/flod/stump/lod3_shell4.ksplat" }
+        ],
+    };
+
+    // --- UI Elements ---
+    const lodDetails = document.getElementById('lod-details');
+    const selectiveDetails = document.getElementById('selective-details');
+
+    /**
+     * Creates a new viewer instance, optionally preserving camera state.
+     * @param {object} [cameraState] - Optional camera state to preserve.
+     * @returns {GaussianSplats3D.Viewer} A new viewer instance.
+     */
+    function createViewer(cameraState) {
+        const viewerOptions = {
+            cameraUp: [0, -1, -0.17],
+            dynamicScene: true,
+            enableOptionalEffects: true,
+            freeIntermediateSplatData: true,
+        };
+
+        if (cameraState) {
+            viewerOptions.initialCameraPosition = cameraState.position;
+            viewerOptions.initialCameraLookAt = cameraState.target;
+        } else {
+            viewerOptions.initialCameraPosition = [-5, -1, -1];
+            viewerOptions.initialCameraLookAt = [-1.72477, 0.05395, -0.00147];
+        }
+
+        const newViewer = new GaussianSplats3D.Viewer(viewerOptions);
+
+        // Style the progress bar, inspired by treehill_interactive5.html
+        // Temporarily show to create DOM elements, then hide. This ensures styling is
+        // applied before the bar is actually needed.
+        newViewer.loadingProgressBar.show();
+        const pbBox = newViewer.loadingProgressBar.progressBarBox;
+        const pb = newViewer.loadingProgressBar.progressBar;
+        if (pbBox && pb) {
+            // Use flexbox for perfect centering and to avoid sizing issues with box-sizing.
+            pbBox.style.height = 'auto';
+            pbBox.style.padding = '4px';
+            pbBox.style.display = 'flex';
+            pbBox.style.alignItems = 'center';
+
+            // Change colors to match the active UI elements for a consistent look.
+            pb.style.backgroundColor = '#10b981'; // --active-color from CSS
+            pb.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.4)';
+        }
+        newViewer.loadingProgressBar.hide();
+
+        return newViewer;
+    }
+
+    /**
+     * Universal function to switch between LODs, adapted from interactive5.
+     * It now handles clearing multiple scenes when switching from region mode.
+     */
+    async function loadAndPromoteLoD(targetLoDPath, mainViewer) {
+        console.log(`[LOD Mode] Starting progressive load of ${targetLoDPath}...`);
+
+        // --- Fade out old scene(s) ---
+        if (mainViewer.getSceneCount() > 0 && mainViewer.splatMesh) {
+            console.log("Fading out old scene(s)...");
+            const splatMesh = mainViewer.splatMesh;
+            splatMesh.material.uniforms.fadeOutMode.value = 2; // Outside-in fade
+
+            await new Promise(resolve => {
+                const duration = 3000;
+                const startTime = performance.now();
+                function animateFadeOut() {
+                    const progress = Math.min((performance.now() - startTime) / duration, 1.0);
+                    // 시간의 20% 동안 바깥쪽 95%가 빠르게, 나머지 2% 동안 중앙 5%가 서서히 사라지도록 타이밍 조절
+                    let easedProgress;
+                    if (progress < 0.2) {
+                        // Phase 1: 시간 [0, 0.2]를 효과 [0, 0.98]에 선형 매핑 (빠른 구간)
+                        const phaseProgress = progress / 0.2;
+                        easedProgress = phaseProgress * 0.95;
+                    } else {
+                        // Phase 2: 시간 [0.2, 1.0]를 효과 [0.9, 1.0]에 ease-out 매핑 (느린 구간)
+                        const phaseProgress = (progress - 0.2) / 0.8;
+                        const easedPhaseProgress = 1.0 - Math.pow(1.0 - phaseProgress, 3); // easeOutCubic
+                        easedProgress = 0.95 + easedPhaseProgress * 0.05;
+                    }
+                    splatMesh.material.uniforms.fadeOutFactor.value = easedProgress;
+                    if (progress < 1.0) requestAnimationFrame(animateFadeOut);
+                    else resolve();
+                }
+                requestAnimationFrame(animateFadeOut);
+            });
+            console.log("Fade out complete.");
+        }
+
+        // --- Load new LOD in a temporary DropInViewer for smooth fade-in ---
+        let resolveRenderingComplete;
+        const renderingCompletePromise = new Promise(r => resolveRenderingComplete = r);
+
+        const dropInViewer = new GaussianSplats3D.DropInViewer({
+          initialCameraPosition: mainViewer.camera.position.toArray(),
+          initialCameraLookAt: mainViewer.controls.target.toArray(),
+          cameraUp: mainViewer.camera.up.toArray(),
+          sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
+          sceneFadeInRateMultiplier: 10.0,
+        });
+        mainViewer.threeScene.add(dropInViewer);
+
+        let progressDisplayed = false;
+        await dropInViewer.addSplatScene(targetLoDPath, {
+          progressiveLoad: true,
+          onProgress: (progress) => {
+            // 로딩이 실제로 시작되면(0% 이상) 프로그레스 바를 표시합니다.
+            // 이렇게 하면 불필요한 100% 깜빡임을 방지할 수 있습니다.
+            if (!progressDisplayed && progress > 0) {
+                mainViewer.loadingProgressBar.setProgress(0);
+                mainViewer.loadingProgressBar.show();
+                progressDisplayed = true;
+            }
+            if (progressDisplayed) {
+                mainViewer.loadingProgressBar.setProgress(progress);
+            }
+            if (progress >= 100) resolveRenderingComplete();
+          },
+        });
+
+        await renderingCompletePromise;
+        console.log("New LOD render complete.");
+
+        // --- Promote new LOD to the main viewer ---
+        console.log("Promoting new LOD...");
+        
+        // Remove ALL old scenes
+        // A while loop is more robust for removing all scenes one-by-one, avoiding potential library bugs with multi-index removal.
+        while(mainViewer.getSceneCount() > 0) {
+            await mainViewer.removeSplatScene(0, false);
+        }
+        console.log("All old scenes removed.");
+
+        // Adopt the new splat buffer
+        const adoptedSplatBuffer = dropInViewer.getSplatScene(0).splatBuffer;
+        await mainViewer.addSplatBuffers([adoptedSplatBuffer]);
+        
+        // Prevent re-animation
+        if (mainViewer.splatMesh) {
+            mainViewer.splatMesh.visibleRegionFadeStartRadius = mainViewer.splatMesh.visibleRegionRadius;
+            mainViewer.splatMesh.updateVisibleRegionFadeDistance(GaussianSplats3D.SceneRevealMode.Instant);
+        }
+
+        // Cleanup
+        const dropInScene = dropInViewer.getSplatScene(0);
+        if (dropInScene) dropInScene.splatBuffer = null;
+        dropInViewer.removeFromParent();
+        await dropInViewer.dispose();
+
+        // 모든 작업이 끝난 후 프로그레스 바를 숨깁니다.
+        if (progressDisplayed) mainViewer.loadingProgressBar.hide();
+
+        console.log("Promotion complete.");
+        return mainViewer;
+    }
+
+    function setLodButtonsEnabled(enabled) {
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById(`level-btn-${i}`).disabled = !enabled;
+        }
+    }
+
+    function setupLodModeListeners() {
+        for (let i = 1; i <= 5; i++) {
+            const button = document.getElementById(`level-btn-${i}`);
+            button.addEventListener("click", async () => {
+                if (currentMode !== 'lod' || isSwitchingMode) return;
+                
+                setLodButtonsEnabled(false);
+                for (let j = 1; j <= 5; j++) {
+                    document.getElementById(`level-btn-${j}`).classList.remove("active");
+                }
+                button.classList.add("active");
+
+                lastActiveLod = i; // 마지막으로 활성화된 LOD 레벨을 업데이트합니다.
+                await loadAndPromoteLoD(lodPaths[i], viewer);
+                console.log(`Switched to LoD ${i} successfully.`);
+                setLodButtonsEnabled(true);
+            });
+        }
+    }
+
+    function setSelectiveButtonsEnabled(enabled) {
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`region-btn-${i}`).disabled = !enabled;
+        }
+    }
+
+    function setupSelectiveModeListeners() {
+        // This map links button IDs to their corresponding scene indices when all are loaded.
+        // Note: Region 3 controls two scenes.
+        const regionSceneMap = {
+            'region-btn-1': [0],       // Corresponds to lod5_shell0
+            'region-btn-2': [1],       // Corresponds to lod4_shell1
+            'region-btn-3': [2, 3],    // Corresponds to lod3_shell2 and lod3_shell3
+        };
+
+        for (const buttonId in regionSceneMap) {
+            const button = document.getElementById(buttonId);
+            if (!button) continue;
+
+            button.addEventListener("click", async () => {
+                // Only allow clicks in selective mode when not switching.
+                if (currentMode !== 'selective' || isSwitchingMode) return;
+                
+                // Toggle the button's active state
+                button.classList.toggle("active");
+                const isNowVisible = button.classList.contains("active");
+
+                const sceneIndices = regionSceneMap[buttonId];
+                console.log(`Toggling visibility for ${buttonId} to ${isNowVisible}. Affecting scene indices: ${sceneIndices.join(', ')}`);
+
+                // Set visibility for the corresponding scene(s)
+                for (const sceneIndex of sceneIndices) {
+                    const scene = viewer.getSplatScene(sceneIndex);
+                    if (scene) {
+                        scene.visible = isNowVisible;
+                    }
+                }
+            });
+        }
+    }
+
+    async function switchToSelectiveMode() {
+        if (isSwitchingMode || currentMode === 'selective') return;
+        isSwitchingMode = true;
+        console.log("Switching to Selective Rendering Mode...");
+
+        const cameraState = { position: viewer.camera.position.toArray(), target: viewer.controls.target.toArray() };        
+        // Dispose old viewer to get a black screen
+        if (viewer) {
+            await viewer.dispose();
+            viewer = null;
+        }
+
+        setLodButtonsEnabled(false);
+        setSelectiveButtonsEnabled(false);
+        lodDetails.open = false;
+        selectiveDetails.open = true;
+        currentMode = 'selective';
+
+        viewer = createViewer(cameraState);
+        await viewer.start();
+
+        // 1. Combine all selective paths into a single array
+        const allSelectivePaths = [
+            ...selectiveRenderingPaths[1],
+            ...selectiveRenderingPaths[2],
+            ...selectiveRenderingPaths[3],
+        ];
+
+        // 2. Load all scenes at once
+        viewer.loadingProgressBar.show();
+        await viewer.addSplatScenes(allSelectivePaths, true, (p) => {
+            viewer.loadingProgressBar.setProgress(p);
+        });
+        viewer.loadingProgressBar.hide();
+        console.log("Directly loaded all selective scenes for initial view.");
+
+        // 3. Set all buttons to active and enabled
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`region-btn-${i}`).classList.add("active");
+        }
+
+        setSelectiveButtonsEnabled(true);
+        isSwitchingMode = false;
+    }
+
+    async function switchToLodMode() {
+        if (isSwitchingMode || currentMode === 'lod') return;
+        isSwitchingMode = true;
+        console.log("Switching to LOD Mode...");
+
+        const cameraState = { position: viewer.camera.position.toArray(), target: viewer.controls.target.toArray() };
+
+        // Dispose old viewer to get a black screen
+        if (viewer) {
+            await viewer.dispose();
+            viewer = null;
+        }
+
+        // Update UI for mode switch
+        lodDetails.open = true;
+        selectiveDetails.open = false;
+        setLodButtonsEnabled(false);
+        setSelectiveButtonsEnabled(false);
+        currentMode = 'lod';
+
+        // Create a new viewer instance
+        viewer = createViewer(cameraState);
+        await viewer.start();
+
+        // 마지막으로 활성화했던 LOD 씬을 검은 화면에 바로 로드합니다.
+        console.log(`Returning to last active LoD: ${lastActiveLod}`);
+        viewer.loadingProgressBar.show();
+        await viewer.addSplatScene(lodPaths[lastActiveLod], {
+            progressiveLoad: true,
+            onProgress: (p) => viewer.loadingProgressBar.setProgress(p)
+        });
+        viewer.loadingProgressBar.hide();
+        console.log(`Directly loaded last active LOD scene: ${lastActiveLod}`);
+
+        // Finalize UI
+        for (let j = 1; j <= 5; j++) document.getElementById(`level-btn-${j}`).classList.remove("active");
+        document.getElementById(`level-btn-${lastActiveLod}`).classList.add("active");
+        
+        setLodButtonsEnabled(true);
+        isSwitchingMode = false;
+    }
+
+    async function initializeLODMode(isSwitch = false) {
+        console.log("Initializing in LOD Mode...");
+        setLodButtonsEnabled(false);
+
+        await viewer.addSplatScene(lodPaths[1]);
+        console.log("Base LoD 1 loaded.");
+
+        await loadAndPromoteLoD(lodPaths[5], viewer);
+
+        for (let j = 1; j <= 5; j++) document.getElementById(`level-btn-${j}`).classList.remove("active");
+        document.getElementById('level-btn-5').classList.add("active");
+        
+        setLodButtonsEnabled(true);
+        if (!isSwitch) {
+            // Listeners are only set once, as buttons are static.
+            setupLodModeListeners();
+        }
+    }
+
+    async function main() {
+      console.log("Initializing unified viewer...");
+
+      viewer = createViewer();
+
+      // Start the viewer's render loop
+      await viewer.start();
+
+      // Set up mode switching listeners
+      lodDetails.addEventListener('toggle', () => {
+        if (lodDetails.open && currentMode !== 'lod') {
+            switchToLodMode();
+        }
+      });
+
+      selectiveDetails.addEventListener('toggle', () => {
+        if (selectiveDetails.open && currentMode !== 'selective') {
+            switchToSelectiveMode();
+        }
+      });
+
+      await initializeLODMode();
+      setupSelectiveModeListeners();
+    }
+
+    window.addEventListener('beforeunload', () => {
+        // 사용자가 페이지를 떠나기 직전에 이 이벤트가 발생합니다.
+        if (viewer) {
+            console.log("Disposing viewer before page unload...");
+            viewer.dispose();
+            viewer = null;
+        }
+    });
+
+    main().catch((err) => {
+      console.error("An error occurred during initialization:", err);
+    });
+  </script>
+</body>
+</html>
