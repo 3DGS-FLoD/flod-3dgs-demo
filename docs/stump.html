@@ -484,6 +484,25 @@
         }
         newViewer.loadingProgressBar.hide();
 
+        if (cameraState) {
+          if (cameraState.up) newViewer.camera.up.fromArray(cameraState.up);
+          if (typeof cameraState.fov === 'number') newViewer.camera.fov = cameraState.fov;
+          if (typeof cameraState.aspect === 'number') newViewer.camera.aspect = cameraState.aspect;
+          newViewer.camera.clearViewOffset();
+          if (cameraState.view && cameraState.view.enabled) {
+            newViewer.camera.setViewOffset(
+              cameraState.view.fullWidth,
+              cameraState.view.fullHeight,
+              cameraState.view.offsetX,
+              cameraState.view.offsetY,
+              cameraState.view.width,
+              cameraState.view.height
+            );
+          }
+          newViewer.camera.updateProjectionMatrix();
+          newViewer.controls.update();
+        }
+
         if (firstPreset) {
           const isPinhole = firstPreset.model === 'PINHOLE';
           const isSimplePinhole = firstPreset.model === 'SIMPLE_PINHOLE';
@@ -686,7 +705,22 @@
         isSwitchingMode = true;
         console.log("Switching to Selective Rendering Mode...");
 
-        const cameraState = { position: viewer.camera.position.toArray(), target: viewer.controls.target.toArray() };        
+        const cameraState = {
+          position: viewer.camera.position.toArray(),
+          target: viewer.controls.target.toArray(),
+          up: viewer.camera.up.toArray(),
+          fov: viewer.camera.fov,
+          aspect: viewer.camera.aspect,
+          view: viewer.camera.view ? {
+            enabled: true,
+            fullWidth: viewer.camera.view.fullWidth,
+            fullHeight: viewer.camera.view.fullHeight,
+            offsetX: viewer.camera.view.offsetX,
+            offsetY: viewer.camera.view.offsetY,
+            width: viewer.camera.view.width,
+            height: viewer.camera.view.height,
+          } : null,
+        };        
         // Dispose old viewer to get a black screen
         if (viewer) {
             await viewer.dispose();
@@ -731,7 +765,22 @@
         isSwitchingMode = true;
         console.log("Switching to LOD Mode...");
 
-        const cameraState = { position: viewer.camera.position.toArray(), target: viewer.controls.target.toArray() };
+        const cameraState = {
+          position: viewer.camera.position.toArray(),
+          target: viewer.controls.target.toArray(),
+          up: viewer.camera.up.toArray(),
+          fov: viewer.camera.fov,
+          aspect: viewer.camera.aspect,
+          view: viewer.camera.view ? {
+            enabled: true,
+            fullWidth: viewer.camera.view.fullWidth,
+            fullHeight: viewer.camera.view.fullHeight,
+            offsetX: viewer.camera.view.offsetX,
+            offsetY: viewer.camera.view.offsetY,
+            width: viewer.camera.view.width,
+            height: viewer.camera.view.height,
+          } : null,
+        };
 
         // Dispose old viewer to get a black screen
         if (viewer) {
