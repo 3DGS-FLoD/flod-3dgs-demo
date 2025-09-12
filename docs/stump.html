@@ -111,17 +111,17 @@
     .level-button {
       background: var(--primary-color);
       color: white;
-      padding: 0.2rem 0.5rem; /* 세로/가로 여백 */
-      border: 2px solid transparent; /* 크기 고정을 위해 투명 테두리 추가 */
+      padding: 0.2rem 0.5rem;
+      border: 2px solid transparent;
       border-radius: 0.25rem;
       cursor: pointer;
-      font-size: 0.8125rem; /* 14px -> 13px, 글자 넘침 방지 */
+      font-size: 0.8125rem;
       transition: all 0.2s ease;
     }
 
     .level-button.active {
       background: var(--active-color);
-      border-color: var(--accent-color); /* 활성화 시 테두리 색상만 변경 */
+      border-color: var(--accent-color); 
     }
 
     .region-toggle {
@@ -136,7 +136,7 @@
       cursor: pointer;
     }
 
-    /* New styles for collapsible sections */
+
     #controls-container {
         display: flex;
         flex-direction: column;
@@ -158,7 +158,7 @@
         cursor: pointer;
         background: rgba(255, 255, 255, 0.1);
         color: var(--primary-color);
-        list-style: none; /* Remove default triangle */
+        list-style: none; 
         position: relative;
     }
     summary::-webkit-details-marker {
@@ -178,11 +178,10 @@
     }
 
     #lod-controls .level-button, #selective-controls .level-button {
-        /* flex-grow: 0으로 설정하여 마지막 줄의 버튼이 늘어나지 않도록 하고, 너비를 3등분합니다. */
-        flex: 0 1 calc((100% - 1rem) / 3); /* 2 * 0.5rem gap */
+        flex: 0 1 calc((100% - 1rem) / 3); 
         text-align: center;
     }
-    /* Scoped details styling for controls overlay */
+    
     .controls-overlay details {
       margin-top: 0.5rem;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -414,7 +413,7 @@
     let initialFirstPreset = null;
     let currentMode = 'lod'; // 'lod' or 'selective'
     let isSwitchingMode = false;
-    let lastActiveLod = 5; // 마지막으로 활성화된 LOD 레벨을 추적합니다.
+    let lastActiveLod = 5; 
 
     const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
     const ksplatUrl = (level) => `${HF_BASE}stump/lod${level}.ksplat`;
@@ -437,15 +436,10 @@
         ],
     };
 
-    // --- UI Elements ---
     const lodDetails = document.getElementById('lod-details');
     const selectiveDetails = document.getElementById('selective-details');
 
-    /**
-     * Creates a new viewer instance, optionally preserving camera state.
-     * @param {object} [cameraState] - Optional camera state to preserve.
-     * @returns {GaussianSplats3D.Viewer} A new viewer instance.
-     */
+    // Creates a new viewer instance, optionally preserving camera state.
     function createViewer(cameraState, firstPreset) {
         const viewerOptions = {
             cameraUp: (firstPreset && firstPreset.up) ? firstPreset.up : [0, -1, -0.17],
@@ -465,21 +459,16 @@
 
         const newViewer = new GaussianSplats3D.Viewer(viewerOptions);
 
-        // Style the progress bar, inspired by treehill_interactive5.html
-        // Temporarily show to create DOM elements, then hide. This ensures styling is
-        // applied before the bar is actually needed.
         newViewer.loadingProgressBar.show();
         const pbBox = newViewer.loadingProgressBar.progressBarBox;
         const pb = newViewer.loadingProgressBar.progressBar;
         if (pbBox && pb) {
-            // Use flexbox for perfect centering and to avoid sizing issues with box-sizing.
             pbBox.style.height = 'auto';
             pbBox.style.padding = '4px';
             pbBox.style.display = 'flex';
             pbBox.style.alignItems = 'center';
 
-            // Change colors to match the active UI elements for a consistent look.
-            pb.style.backgroundColor = '#10b981'; // --active-color from CSS
+            pb.style.backgroundColor = '#10b981'; 
             pb.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.4)';
         }
         newViewer.loadingProgressBar.hide();
@@ -526,10 +515,6 @@
         return newViewer;
     }
 
-    /**
-     * Universal function to switch between LODs, adapted from interactive5.
-     * It now handles clearing multiple scenes when switching from region mode.
-     */
     async function loadAndPromoteLoD(targetLoDPath, mainViewer) {
         console.log(`[LOD Mode] Starting progressive load of ${targetLoDPath}...`);
 
@@ -544,14 +529,12 @@
                 const startTime = performance.now();
                 function animateFadeOut() {
                     const progress = Math.min((performance.now() - startTime) / duration, 1.0);
-                    // 시간의 20% 동안 바깥쪽 95%가 빠르게, 나머지 2% 동안 중앙 5%가 서서히 사라지도록 타이밍 조절
+                    // Quick outer fade, slow center fade
                     let easedProgress;
                     if (progress < 0.2) {
-                        // Phase 1: 시간 [0, 0.2]를 효과 [0, 0.98]에 선형 매핑 (빠른 구간)
                         const phaseProgress = progress / 0.2;
                         easedProgress = phaseProgress * 0.95;
                     } else {
-                        // Phase 2: 시간 [0.2, 1.0]를 효과 [0.9, 1.0]에 ease-out 매핑 (느린 구간)
                         const phaseProgress = (progress - 0.2) / 0.8;
                         const easedPhaseProgress = 1.0 - Math.pow(1.0 - phaseProgress, 3); // easeOutCubic
                         easedProgress = 0.95 + easedPhaseProgress * 0.05;
@@ -565,7 +548,7 @@
             console.log("Fade out complete.");
         }
 
-        // --- Load new LOD in a temporary DropInViewer for smooth fade-in ---
+        // Load new LOD in a temporary DropInViewer for smooth fade-in
         let resolveRenderingComplete;
         const renderingCompletePromise = new Promise(r => resolveRenderingComplete = r);
 
@@ -583,8 +566,6 @@
         await dropInViewer.addSplatScene(targetLoDPath, {
           progressiveLoad: true,
           onProgress: (progress) => {
-            // 로딩이 실제로 시작되면(0% 이상) 프로그레스 바를 표시합니다.
-            // 이렇게 하면 불필요한 100% 깜빡임을 방지할 수 있습니다.
             if (!progressDisplayed && progress > 0) {
                 mainViewer.loadingProgressBar.setProgress(0);
                 mainViewer.loadingProgressBar.show();
@@ -599,12 +580,9 @@
 
         await renderingCompletePromise;
         console.log("New LOD render complete.");
-
-        // --- Promote new LOD to the main viewer ---
         console.log("Promoting new LOD...");
         
-        // Remove ALL old scenes
-        // A while loop is more robust for removing all scenes one-by-one, avoiding potential library bugs with multi-index removal.
+        // Remove all old scenes
         while(mainViewer.getSceneCount() > 0) {
             await mainViewer.removeSplatScene(0, false);
         }
@@ -626,7 +604,6 @@
         dropInViewer.removeFromParent();
         await dropInViewer.dispose();
 
-        // 모든 작업이 끝난 후 프로그레스 바를 숨깁니다.
         if (progressDisplayed) mainViewer.loadingProgressBar.hide();
 
         console.log("Promotion complete.");
@@ -651,7 +628,7 @@
                 }
                 button.classList.add("active");
 
-                lastActiveLod = i; // 마지막으로 활성화된 LOD 레벨을 업데이트합니다.
+                lastActiveLod = i; 
                 await loadAndPromoteLoD(lodPaths[i], viewer);
                 console.log(`Switched to LoD ${i} successfully.`);
                 setLodButtonsEnabled(true);
@@ -666,8 +643,6 @@
     }
 
     function setupSelectiveModeListeners() {
-        // This map links button IDs to their corresponding scene indices when all are loaded.
-        // Note: Region 3 controls two scenes.
         const regionSceneMap = {
             'region-btn-1': [0],       // Corresponds to lod5_shell0
             'region-btn-2': [1],       // Corresponds to lod4_shell1
@@ -682,14 +657,13 @@
                 // Only allow clicks in selective mode when not switching.
                 if (currentMode !== 'selective' || isSwitchingMode) return;
                 
-                // Toggle the button's active state
                 button.classList.toggle("active");
                 const isNowVisible = button.classList.contains("active");
 
                 const sceneIndices = regionSceneMap[buttonId];
                 console.log(`Toggling visibility for ${buttonId} to ${isNowVisible}. Affecting scene indices: ${sceneIndices.join(', ')}`);
 
-                // Set visibility for the corresponding scene(s)
+                // Set visibility for corresponding scene(s)
                 for (const sceneIndex of sceneIndices) {
                     const scene = viewer.getSplatScene(sceneIndex);
                     if (scene) {
@@ -736,14 +710,14 @@
         viewer = createViewer(cameraState, initialFirstPreset);
         await viewer.start();
 
-        // 1. Combine all selective paths into a single array
+        // Combine selective paths
         const allSelectivePaths = [
             ...selectiveRenderingPaths[1],
             ...selectiveRenderingPaths[2],
             ...selectiveRenderingPaths[3],
         ];
 
-        // 2. Load all scenes at once
+        // Load all scenes
         viewer.loadingProgressBar.show();
         await viewer.addSplatScenes(allSelectivePaths, true, (p) => {
             viewer.loadingProgressBar.setProgress(p);
@@ -751,7 +725,7 @@
         viewer.loadingProgressBar.hide();
         console.log("Directly loaded all selective scenes for initial view.");
 
-        // 3. Set all buttons to active and enabled
+        // Set all buttons active
         for (let i = 1; i <= 3; i++) {
             document.getElementById(`region-btn-${i}`).classList.add("active");
         }
@@ -799,7 +773,7 @@
         viewer = createViewer(cameraState, initialFirstPreset);
         await viewer.start();
 
-        // 마지막으로 활성화했던 LOD 씬을 검은 화면에 바로 로드합니다.
+        // Load last active LOD immediately
         console.log(`Returning to last active LoD: ${lastActiveLod}`);
         viewer.loadingProgressBar.show();
         await viewer.addSplatScene(lodPaths[lastActiveLod], {
@@ -831,7 +805,6 @@
         
         setLodButtonsEnabled(true);
         if (!isSwitch) {
-            // Listeners are only set once, as buttons are static.
             setupLodModeListeners();
         }
     }
@@ -842,7 +815,6 @@
       initialFirstPreset = firstPreset;
       viewer = createViewer(undefined, firstPreset);
 
-      // Start the viewer's render loop
       await viewer.start();
 
       // Set up mode switching listeners
@@ -863,7 +835,6 @@
     }
 
     window.addEventListener('beforeunload', () => {
-        // 사용자가 페이지를 떠나기 직전에 이 이벤트가 발생합니다.
         if (viewer) {
             console.log("Disposing viewer before page unload...");
             viewer.dispose();
