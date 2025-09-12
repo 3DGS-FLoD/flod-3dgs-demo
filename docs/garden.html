@@ -234,7 +234,7 @@
     let lastActiveLod = 5; // 마지막으로 활성화된 LOD 레벨을 추적합니다.
 
     const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
-    const ksplatUrl = (level) => `${HF_BASE}/garden/lod${level}.ksplat`;
+    const ksplatUrl = (level) => `${HF_BASE}garden/lod${level}.ksplat`;
 
     const lodPaths = {
         1: ksplatUrl(1),
@@ -245,11 +245,11 @@
     };
 
     const selectiveRenderingPaths = {
-        1: [{ path: `${HF_BASE}/garden/lod5_shell0.ksplat` }],
-        2: [{ path: `${HF_BASE}/garden/lod4_shell1.ksplat` }],
+        1: [{ path: `${HF_BASE}garden/lod5_shell0.ksplat` }],
+        2: [{ path: `${HF_BASE}garden/lod4_shell1.ksplat` }],
         3: [
-            { path: `${HF_BASE}/garden/lod3_shell2.ksplat` },
-            { path: `${HF_BASE}/garden/lod3_shell3.ksplat` },
+            { path: `${HF_BASE}garden/lod3_shell2.ksplat` },
+            { path: `${HF_BASE}garden/lod3_shell3.ksplat` },
         ],
     };
 

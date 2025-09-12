@@ -420,7 +420,7 @@
       });
       viewerBase.loadingProgressBar.show();
       const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
-      const ksplatUrl = (level) => `${HF_BASE}/kitchen/lod${level}.ksplat`;
+      const ksplatUrl = (level) => `${HF_BASE}kitchen/lod${level}.ksplat`;
       // Apply intrinsics from first preset before loading scene (no duplicate pose math)
       if (firstPreset) {
         const isPinhole = firstPreset.model === 'PINHOLE';
