@@ -269,6 +269,7 @@
             dynamicScene: true,
             enableOptionalEffects: true,
             freeIntermediateSplatData: true,
+            sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
         };
 
         if (cameraState) {
@@ -352,6 +353,7 @@
           cameraUp: mainViewer.camera.up.toArray(),
           sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
           sceneFadeInRateMultiplier: 10.0,
+          sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
         });
         mainViewer.threeScene.add(dropInViewer);
 
