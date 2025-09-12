@@ -188,18 +188,78 @@
 <body>
   <div class="controls-overlay">
     <div class="controls-title">Controls</div>
-    <div class="control-item">
-      <div class="control-key">WASD</div>
-      <div class="control-description">Move camera</div>
-    </div>
-    <div class="control-item">
-      <div class="control-key">Mouse</div>
-      <div class="control-description">Look around</div>
-    </div>
-    <div class="control-item">
-      <div class="control-key">Scroll</div>
-      <div class="control-description">Zoom in/out</div>
-    </div>
+    <details>
+      <summary>Controls</summary>
+      <div class="controls-content">
+        <div class="control-section">
+          <div class="control-section-title">Mouse</div>
+          <div class="control-item">
+            <div class="control-key">Mouse</div>
+            <div class="control-description">Look around</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">Scroll</div>
+            <div class="control-description">Zoom in/out</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">LMB</div>
+            <div class="control-description">Set the focal point</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">LMB+Drag</div>
+            <div class="control-description">Orbit around the focal point</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">RMB+Drag</div>
+            <div class="control-description">Pan the camera and focal point</div>
+          </div>
+        </div>
+
+        <div class="control-section">
+          <div class="control-section-title">Keyboard</div>
+          <div class="control-item">
+            <div class="control-key">WASD</div>
+            <div class="control-description">Move camera</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">C</div>
+            <div class="control-description">Toggle mesh cursor (intersection point)</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">I</div>
+            <div class="control-description">Toggle info panel (FPS, camera position, etc.)</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">U</div>
+            <div class="control-description">Toggle debug object (camera orientation)</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">←</div>
+            <div class="control-description">Rotate camera up vector counter-clockwise</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">→</div>
+            <div class="control-description">Rotate camera up vector clockwise</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">P</div>
+            <div class="control-description">Toggle point-cloud mode</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">=</div>
+            <div class="control-description">Increase splat scale</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">-</div>
+            <div class="control-description">Decrease splat scale</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">O</div>
+            <div class="control-description">Toggle orthographic mode</div>
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 
     <div id="controls-container" class="level-selection-overlay">
