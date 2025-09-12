@@ -18,7 +18,7 @@
     {
       "imports": {
         "three": "./lib/three.module.js",
-        "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        "gaussian-splats-3d": "./lib/gaussian-splats-3d.module.min.js" 
       }
     }
   </script>
@@ -232,20 +232,23 @@
     let isSwitchingMode = false;
     let lastActiveLod = 5; // 마지막으로 활성화된 LOD 레벨을 추적합니다.
 
+    const HF_BASE = "https://huggingface.co/laphisboy/flod-3dgs/resolve/main/";
+    const ksplatUrl = (level) => `${HF_BASE}/kitchen/lod${level}.ksplat`;
+
     const lodPaths = {
-        1: "assets/flod_data/kitchen/kitchen_level1.ksplat",
-        2: "assets/flod_data/kitchen/kitchen_level2.ksplat",
-        3: "assets/flod_data/kitchen/kitchen_level3.ksplat",
-        4: "assets/flod_data/kitchen/kitchen_level4.ksplat",
-        5: "assets/flod_data/kitchen/kitchen_level5.ksplat",
+        1: ksplatUrl(1),
+        2: ksplatUrl(2),
+        3: ksplatUrl(3),
+        4: ksplatUrl(4),
+        5: ksplatUrl(5),
     };
 
     const selectiveRenderingPaths = {
-        1: [{ path: "assets/flod/kitchen/lod5_shell0.ksplat" }],
-        2: [{ path: "assets/flod/kitchen/lod4_shell1.ksplat" }],
+        1: [{ path: `${HF_BASE}/kitchen/lod5_shell0.ksplat` }],
+        2: [{ path: `${HF_BASE}/kitchen/lod4_shell1.ksplat` }],
         3: [
-            { path: "assets/flod/kitchen/lod3_shell2.ksplat" },
-            { path: "assets/flod/kitchen/lod3_shell3.ksplat" },
+            { path: `${HF_BASE}/kitchen/lod3_shell2.ksplat` },
+            { path: `${HF_BASE}/kitchen/lod3_shell3.ksplat` },
         ],
     };
 
