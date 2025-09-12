@@ -407,6 +407,7 @@
 
     // --- Global State ---
     let viewer;
+    let initialFirstPreset = null;
     let currentMode = 'lod'; // 'lod' or 'selective'
     let isSwitchingMode = false;
     let lastActiveLod = 5; // 마지막으로 활성화된 LOD 레벨을 추적합니다.
@@ -693,7 +694,7 @@
         selectiveDetails.open = true;
         currentMode = 'selective';
 
-        viewer = createViewer(cameraState);
+        viewer = createViewer(cameraState, initialFirstPreset);
         await viewer.start();
 
         // 1. Combine all selective paths into a single array
@@ -741,7 +742,7 @@
         currentMode = 'lod';
 
         // Create a new viewer instance
-        viewer = createViewer(cameraState);
+        viewer = createViewer(cameraState, initialFirstPreset);
         await viewer.start();
 
         // 마지막으로 활성화했던 LOD 씬을 검은 화면에 바로 로드합니다.
@@ -784,6 +785,7 @@
     async function main() {
       console.log("Initializing unified viewer...");
       const firstPreset = await loadFirstCameraPreset();
+      initialFirstPreset = firstPreset;
       viewer = createViewer(undefined, firstPreset);
 
       // Start the viewer's render loop
