@@ -124,6 +124,10 @@
       border-color: var(--accent-color); 
     }
 
+    #selective-controls .level-button:not(.active) {
+      background-color: var(--text-secondary);
+    }
+
     .region-toggle {
       margin-right: 8px;
       accent-color: var(--primary-color);
@@ -229,14 +233,6 @@
         <div class="control-section">
           <div class="control-section-title">Mouse</div>
           <div class="control-item">
-            <div class="control-key">Mouse</div>
-            <div class="control-description">Look around</div>
-          </div>
-          <div class="control-item">
-            <div class="control-key">Scroll</div>
-            <div class="control-description">Zoom in/out</div>
-          </div>
-          <div class="control-item">
             <div class="control-key">LMB</div>
             <div class="control-description">Set the focal point</div>
           </div>
@@ -247,6 +243,10 @@
           <div class="control-item">
             <div class="control-key">RMB+Drag</div>
             <div class="control-description">Pan the camera and focal point</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">Scroll</div>
+            <div class="control-description">Zoom in/out</div>
           </div>
         </div>
 
@@ -447,6 +447,7 @@
             enableOptionalEffects: true,
             freeIntermediateSplatData: true,
             sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
+            sphericalHarmonicsDegree: 2,
         };
 
         if (cameraState) {
@@ -559,6 +560,7 @@
           sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
           sceneFadeInRateMultiplier: 10.0,
           sharedMemoryForWorkers: false,  // Disable for GitHub Pages compatibility
+          sphericalHarmonicsDegree: 2,
         });
         mainViewer.threeScene.add(dropInViewer);
 
@@ -641,6 +643,18 @@
             document.getElementById(`region-btn-${i}`).disabled = !enabled;
         }
     }
+
+    function setTargetDistanceFromCamera(viewer, desiredDistance) {
+      const camera = viewer.camera;
+      const controls = viewer.controls;
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      const newTarget = new THREE.Vector3().copy(camera.position).addScaledVector(forward, desiredDistance);
+      controls.target.copy(newTarget);
+      camera.lookAt(newTarget);
+      controls.update();
+    }
+
 
     function setupSelectiveModeListeners() {
         const regionSceneMap = {
@@ -816,6 +830,9 @@
       viewer = createViewer(undefined, firstPreset);
 
       await viewer.start();
+
+      // Optionally force a specific camera→target distance (in world units)
+      setTargetDistanceFromCamera(viewer, 4.0);
 
       // Set up mode switching listeners
       lodDetails.addEventListener('toggle', () => {

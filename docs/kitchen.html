@@ -233,14 +233,6 @@
         <div class="control-section">
           <div class="control-section-title">Mouse</div>
           <div class="control-item">
-            <div class="control-key">Mouse</div>
-            <div class="control-description">Look around</div>
-          </div>
-          <div class="control-item">
-            <div class="control-key">Scroll</div>
-            <div class="control-description">Zoom in/out</div>
-          </div>
-          <div class="control-item">
             <div class="control-key">LMB</div>
             <div class="control-description">Set the focal point</div>
           </div>
@@ -251,6 +243,10 @@
           <div class="control-item">
             <div class="control-key">RMB+Drag</div>
             <div class="control-description">Pan the camera and focal point</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">Scroll</div>
+            <div class="control-description">Zoom in/out</div>
           </div>
         </div>
 
@@ -497,7 +493,6 @@
           newViewer.controls.update();
         }
 
-        // Apply intrinsics from first preset if available
         if (firstPreset) {
           const isPinhole = firstPreset.model === 'PINHOLE';
           const isSimplePinhole = firstPreset.model === 'SIMPLE_PINHOLE';
@@ -648,6 +643,7 @@
             document.getElementById(`region-btn-${i}`).disabled = !enabled;
         }
     }
+    
     function setTargetDistanceFromCamera(viewer, desiredDistance) {
       const camera = viewer.camera;
       const controls = viewer.controls;
