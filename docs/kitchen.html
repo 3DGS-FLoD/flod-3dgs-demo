@@ -429,8 +429,10 @@
     const selectiveRenderingPaths = {
         1: [{ path: `${HF_BASE}kitchen/lod5_shell0.ksplat` }],
         2: [{ path: `${HF_BASE}kitchen/lod4_shell1.ksplat` }],
-        3: [{ path: `${HF_BASE}kitchen/lod3_shell2.ksplat` }],
-    };
+        3: [
+            { path: `${HF_BASE}kitchen/lod3_shell2.ksplat` },
+            { path: `${HF_BASE}kitchen/lod3_shell3.ksplat` },
+        ],    };
 
     const lodDetails = document.getElementById('lod-details');
     const selectiveDetails = document.getElementById('selective-details');
@@ -657,7 +659,7 @@
         const regionSceneMap = {
             'region-btn-1': [0],       // Corresponds to lod5_shell0
             'region-btn-2': [1],       // Corresponds to lod4_shell1
-            'region-btn-3': [2],    // Corresponds to lod3_shell2 
+            'region-btn-3': [2, 3],    // Corresponds to lod3_shell2 and lod3_shell3
         };
 
         for (const buttonId in regionSceneMap) {
